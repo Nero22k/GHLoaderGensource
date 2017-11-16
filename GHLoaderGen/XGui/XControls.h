@@ -86,13 +86,18 @@ inline int CXControls::AddControlToGroup(XID xGroupID, XID id, int x, int y, int
 {
 	int iRet;
 	//in case you're grouping radio buttons on the main window and not in a groupbox control.
+	
 	if (bIsGroup)
 	{
 		mControls[id] = new T(pOwner, id, x, y, w, h, szText, pFont);
-		iRet = vGroups[xGroupID]->AddControl(mControls[id]);
+		vGroups[xGroupID]->AddControl(mControls[id]);
+		iRet = vGroups.size();
 	}
 	else
-		iRet = vGroups[xGroupID]->AddControl<T>(id, x, y, w, h, szText, pFont);
+	{
+		vGroups[xGroupID]->AddControl<T>(id, x, y, w, h, szText, pFont);
+		iRet = vGroups.size();
+	}
 
 	CXControl* pControl = vGroups[xGroupID]->GetControl<T>(id);
 	if (pControl->GetControlType() == RADIO)

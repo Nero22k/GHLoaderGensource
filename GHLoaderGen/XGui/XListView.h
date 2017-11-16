@@ -37,6 +37,8 @@ public:
 	virtual void OnNotify(UINT code, LPARAM lParam);
 	bool InsertColumn(tstring szText);
 	bool InsertColumn(tstring szText, int width);
+	bool InsertColumn(tstring szText, int width, DWORD lvcfFmt);
+	void SetColumnWidth(int iColumn, int width);
 	bool AddItem(int iItem, int iSubItem);
 	bool AddItem(CXListViewItem & xListViewItem);
 private:

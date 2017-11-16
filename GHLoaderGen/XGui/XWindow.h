@@ -31,6 +31,7 @@ public:
 	virtual XID GetID();
 	virtual COLORREF GetBackgroundColor();
 	virtual RECT GetRect();
+	virtual RECT GetAdjRect();
 	virtual UINT GetWidth();
 	virtual UINT GetHeight();
 	virtual HICON GetIcon();
@@ -38,6 +39,7 @@ public:
 	virtual WINDOWPOS GetPos();
 	virtual DWORD GetStyle();
 	virtual RECT & GetWndRect();
+	virtual HANDLE GetBackground();
 
 	virtual void SetOwnerWindow(CXWindow* pWindow);
 	virtual void SetBgColor(COLORREF clColor);
@@ -50,6 +52,7 @@ public:
 	virtual void SetWidth(UINT uWidth);
 	virtual void SetHeight(UINT uHeight);
 	virtual void SetBrush(HBRUSH hBrush);
+	virtual void SetWndProc(WNDPROC WndProc);
 
 protected:
 	CXWindow*	pOwnerWindow;

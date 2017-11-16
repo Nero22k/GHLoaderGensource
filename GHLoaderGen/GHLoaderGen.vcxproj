@@ -146,7 +146,11 @@
   <ItemGroup>
     <ClInclude Include="GHLGen.h" />
     <ClInclude Include="GHLMainWindow.h" />
+    <ClInclude Include="GHLProcPicker.h" />
     <ClInclude Include="Include\stdafx.h" />
+    <ClInclude Include="Process.h" />
+    <ClInclude Include="ProcManager.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="XGui\XBitmap.h" />
     <ClInclude Include="XGui\XButton.h" />
     <ClInclude Include="XGui\XCheckBox.h" />
@@ -169,10 +173,14 @@
     <ClInclude Include="XGui\XTabControl.h" />
     <ClInclude Include="XGui\XTrackBar.h" />
     <ClInclude Include="XGui\XWindow.h" />
+    <ClInclude Include="XResource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GHLGen.cpp" />
     <ClCompile Include="GHLMainWindow.cpp" />
+    <ClCompile Include="GHLProcPicker.cpp" />
+    <ClCompile Include="Process.cpp" />
+    <ClCompile Include="ProcManager.cpp" />
     <ClCompile Include="WinMain.cpp" />
     <ClCompile Include="XGui\XBitmap.cpp" />
     <ClCompile Include="XGui\XButton.cpp" />
@@ -196,6 +204,13 @@
     <ClCompile Include="XGui\XTabControl.cpp" />
     <ClCompile Include="XGui\XTrackBar.cpp" />
     <ClCompile Include="XGui\XWindow.cpp" />
+    <ClCompile Include="XResource.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GHLoaderGen.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

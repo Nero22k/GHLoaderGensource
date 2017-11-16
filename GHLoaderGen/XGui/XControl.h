@@ -28,6 +28,7 @@ public:
 	~CXControl();
 	virtual bool Create();
 	virtual ECXControl GetControlType();
+	virtual RECT GetAdjustedRect();
 	virtual void SetFont(CXFont * pFont);
 	virtual void SetTxtColor(COLORREF clText);
 	virtual void SetAction(std::function<void(uintptr_t)> fnAction);
@@ -37,6 +38,7 @@ public:
 	virtual LRESULT OnDrawItem(WPARAM wParam, LPARAM lParam);
 	virtual LRESULT OnCtlColor(WPARAM wParam, LPARAM lParam);
 	virtual void OnHover(POINT p);
+	virtual void OnHScroll(WPARAM wParam, LPARAM lParam);
 
 protected:
 	ECXControl ControlType;

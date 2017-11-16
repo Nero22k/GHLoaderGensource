@@ -21,6 +21,7 @@ CXControl::CXControl(CXWindow * pOwner, XID xID, ECXControl ControlType, int x, 
 	rc.top = y;
 	rc.bottom = y + h;
 	SetRect(rc);
+	hBgr = (HBRUSH)pOwner->GetBackground();
 }
 
 CXControl::~CXControl()
@@ -39,6 +40,16 @@ bool CXControl::Create()
 ECXControl CXControl::GetControlType()
 {
 	return this->ControlType;
+}
+
+RECT CXControl::GetAdjustedRect()
+{
+	RECT rc;
+	rc.left = GetPos().x;
+	rc.top = GetPos().y;
+	rc.right = rc.left + GetWidth();
+	rc.bottom = rc.top + uHeight;
+	return rc;
 }
 
 void CXControl::SetAction(std::function<void(uintptr_t)> fnAction)
@@ -84,6 +95,10 @@ LRESULT CXControl::OnCtlColor(WPARAM wParam, LPARAM lParam)
 }
 
 void CXControl::OnHover(POINT p)
+{
+}
+
+void CXControl::OnHScroll(WPARAM wParam, LPARAM lParam)
 {
 }
 

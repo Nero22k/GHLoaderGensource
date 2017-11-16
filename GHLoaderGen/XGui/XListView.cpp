@@ -62,16 +62,36 @@ bool CXListView::InsertColumn(tstring szText)
 
 bool CXListView::InsertColumn(tstring szText, int width)
 {
+	//LVCOLUMN lvc;
+	//lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
+	//lvc.iSubItem = iCol;
+	//lvc.cx = 100;
+	//lvc.pszText = &szText[0];
+	//lvc.fmt = LVCFMT_LEFT;
+	//if(ListView_InsertColumn(hWnd, iCol, &lvc) == -1)
+	//	return false;
+	//iCol++;
+	//return true;
+	return InsertColumn(szText, width, LVCFMT_LEFT);
+}
+
+bool CXListView::InsertColumn(tstring szText, int width, DWORD lvcfFmt)
+{
 	LVCOLUMN lvc;
 	lvc.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
 	lvc.iSubItem = iCol;
-	lvc.cx = 100;
+	lvc.cx = width;
 	lvc.pszText = &szText[0];
-	lvc.fmt = LVCFMT_LEFT;
-	if(ListView_InsertColumn(hWnd, iCol, &lvc) == -1)
+	lvc.fmt = lvcfFmt;
+	if (ListView_InsertColumn(hWnd, iCol, &lvc) == -1)
 		return false;
 	iCol++;
 	return true;
+}
+
+void CXListView::SetColumnWidth(int iColumn, int width)
+{
+	ListView_SetColumnWidth(hWnd, iColumn, width);
 }
 
 bool CXListView::AddItem(int iItem, int iSubItem)

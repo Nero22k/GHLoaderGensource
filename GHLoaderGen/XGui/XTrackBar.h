@@ -10,6 +10,8 @@ public:
 	~CXTrackBar();
 
 	virtual bool Create();
+	virtual void OnNotify(UINT code, LPARAM lParam);
+	virtual void OnHScroll(WPARAM wParam, LPARAM lParam);
 	virtual LRESULT OnCtlColor(WPARAM wParam, LPARAM lParam);
 };
 

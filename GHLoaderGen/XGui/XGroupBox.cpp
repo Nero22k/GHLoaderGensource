@@ -27,13 +27,14 @@ void CXGroupBox::SetControlManager(CXControls * pControls)
 	this->pControls = pControls;
 }
 
-//LRESULT CXGroupBox::OnDrawItem(WPARAM wParam, LPARAM lParam)
-//{
-//	LPDRAWITEMSTRUCT lpDI = (LPDRAWITEMSTRUCT)lParam;
-//	HTHEME hTheme = OpenThemeData(hWnd, WC_BUTTON);
-//	Draw(hTheme, lpDI);	
-//	return 0;
-//}
+LRESULT CXGroupBox::OnDrawItem(WPARAM wParam, LPARAM lParam)
+{
+	CXOwnerDrawControl::OnDrawItem(wParam, lParam);
+	if(pControls)
+		for (auto p : pControls->mControls)
+			p.second->OnDrawItem(wParam, lParam);
+	return 0;
+}
 //
 //void CXGroupBox::Paint(LPDRAWITEMSTRUCT lpDI)
 //{

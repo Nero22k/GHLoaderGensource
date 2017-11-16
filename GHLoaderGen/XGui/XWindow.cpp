@@ -74,8 +74,8 @@ WNDCLASSEX CXWindow::CreateBasicClass(tstring &szClassName)
 	wcx.hbrBackground = hBgr;
 	wcx.lpszMenuName = szMenu.c_str();
 	wcx.lpszClassName = szClassName.c_str();
-	hIcon = wcx.hIcon = LoadIcon(NULL,IDI_APPLICATION);
-	hIconSm = wcx.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+	hIcon = wcx.hIcon = (hIcon) ? hIcon : LoadIcon(NULL,IDI_APPLICATION);
+	hIconSm = wcx.hIconSm = (hIconSm) ? hIconSm : LoadIcon(NULL, IDI_APPLICATION);
 	return wcx;
 }
 
@@ -140,18 +140,29 @@ COLORREF CXWindow::GetBackgroundColor()
 
 RECT CXWindow::GetRect()
 {
-	GetClientRect(hWnd, &rcRect);
+	GetPos();
+	rcRect = { wpPos.x, wpPos.y, wpPos.x + wpPos.cx, wpPos.y + wpPos.cy };
+	/*GetClientRect(hWnd, &rcRect);*/
+	return rcRect;
+}
+
+RECT CXWindow::GetAdjRect()
+{
+	GetPos();
+	//rcRect = { wpPos.x, wpPos.y, (uint)wpPos.x + uWidth, (uint)wpPos.y + uHeight };
 	return rcRect;
 }
 
 UINT CXWindow::GetWidth()
 {
-	return uWidth;
+	GetRect();
+	return rcRect.right - rcRect.left;
 }
 
 UINT CXWindow::GetHeight()
 {
-	return uHeight;
+	GetRect();
+	return rcRect.bottom - rcRect.top;
 }
 
 HICON CXWindow::GetIcon()
@@ -166,6 +177,11 @@ HICON CXWindow::GetIconSm()
 
 WINDOWPOS CXWindow::GetPos()
 {
+	//GetWindowRect(hWnd, &rcRect);
+	//wpPos.x = rcRect.left;
+	//wpPos.y = rcRect.top;
+	//wpPos.cx = rcRect.right - rcRect.left;
+	//wpPos.cy = rcRect.bottom - rcRect.top;
 	return wpPos;
 }
 
@@ -178,6 +194,11 @@ RECT & CXWindow::GetWndRect()
 {
 	GetWindowRect(hWnd, &rcWindow);
 	return rcWindow;
+}
+
+HANDLE CXWindow::GetBackground()
+{
+	return hBgr;
 }
 
 void CXWindow::SetOwnerWindow(CXWindow * pWindow)
@@ -238,6 +259,11 @@ void CXWindow::SetHeight(UINT uHeight)
 void CXWindow::SetBrush(HBRUSH hBrush)
 {
 	this->hBgr = hBrush;
+}
+
+void CXWindow::SetWndProc(WNDPROC WndProc)
+{
+	SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG)WndProc);
 }
 
 void CXWindow::SetText(tstring szText)

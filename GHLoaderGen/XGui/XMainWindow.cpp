@@ -38,13 +38,17 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case WM_COMMAND:
 		{
 			int id = LOWORD(wParam);
-			g_pControls->mControls[id]->OnCommand(wParam, lParam);
+			if(g_pControls->mControls[id])
+				g_pControls->mControls[id]->OnCommand(wParam, lParam);
 			return 0;
 		}
 		case WM_DRAWITEM:
 		{
 			if (g_pControls)
-				return g_pControls->mControls[wParam]->OnDrawItem(wParam, lParam);
+			{
+				if(g_pControls->mControls[wParam])
+					return g_pControls->mControls[wParam]->OnDrawItem(wParam, lParam);
+			}
 			break;
 		}
 		case WM_PAINT:
@@ -57,8 +61,9 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		case WM_CTLCOLORSTATIC:
 		{
 			int id = GetDlgCtrlID((HWND)lParam);
-			return g_pControls->mControls[id]->OnCtlColor(wParam, lParam);
-			//return LRESULT(GetStockObject(HOLLOW_BRUSH));
+			if(g_pControls->mControls[id])
+				return g_pControls->mControls[id]->OnCtlColor(wParam, lParam);
+			break;
 		}
 		case WM_NOTIFY:
 		{
@@ -66,10 +71,16 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 			int id = pNMHDR->idFrom;
 			if(id > 1)
-			g_pControls->mControls[id]->OnNotify(pNMHDR->code, lParam);
+				if(g_pControls->mControls[id])
+					g_pControls->mControls[id]->OnNotify(pNMHDR->code, lParam);
 
 
 			break;
+		}
+		case WM_HSCROLL:
+		{
+			if (g_pControls->mControls[wParam])
+				g_pControls->mControls[wParam]->OnHScroll(wParam, lParam);
 		}
 		case WM_MOUSEMOVE:
 		{

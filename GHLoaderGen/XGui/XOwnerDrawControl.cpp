@@ -19,7 +19,8 @@ LRESULT CALLBACK OwnerDrawProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 			tme.hwndTrack = hWnd;
 			TrackMouseEvent(&tme);
 			pODControl->SetHot(true);
-			InvalidateRect(hWnd, &pODControl->GetRect(), FALSE);
+			//InvalidateRect(hWnd, &pODControl->GetRect(), FALSE);
+			RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
 			return 0;
 		}
 		case WM_MOUSELEAVE:
@@ -27,13 +28,14 @@ LRESULT CALLBACK OwnerDrawProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 			if (pODControl->GetControlType() == GROUPBOX)
 				break;
 			pODControl->SetHot(false);
-			InvalidateRect(hWnd, &pODControl->GetRect(), FALSE);
+			RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
 			return 0;
 		}
 		case WM_DRAWITEM:
 		{
 			LPDRAWITEMSTRUCT lpDI = (LPDRAWITEMSTRUCT)lParam;
-			return mODControls[lpDI->CtlID]->OnDrawItem(wParam, lParam);
+			if(mODControls[lpDI->CtlID])
+				mODControls[lpDI->CtlID]->OnDrawItem(wParam, lParam);
 			break;
 		}
 		case WM_CTLCOLOR:
@@ -45,7 +47,8 @@ LRESULT CALLBACK OwnerDrawProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 		case WM_COMMAND:
 		{
 			int id = LOWORD(wParam);
-			mODControls[id]->OnCommand(wParam, lParam);
+			if(mODControls[id])
+				return mODControls[id]->OnCommand(wParam, lParam);
 			return 0;
 		}
 		case WM_ERASEBKGND:
@@ -224,7 +227,10 @@ void CXOwnerDrawControl::Draw(HTHEME hTheme, LPDRAWITEMSTRUCT lpDI)
 	{
 		COLORREF clBgr = GetOwnerWindow()->GetBackgroundColor();
 		hBgr = CreateSolidBrush(clBgr);
-		FillRect(lpDI->hDC, &rcText, hBgr);
+		RECT rcLine = rcText;
+		rcLine.bottom -= 5;
+		rcLine.top += 5;
+		FillRect(lpDI->hDC, &rcLine, hBgr);
 		rcText.left += 4;
 	}
 

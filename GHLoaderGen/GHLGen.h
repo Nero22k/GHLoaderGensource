@@ -11,6 +11,7 @@ public:
 private:
 	std::vector<CXWindow*> vWindows;
 	HINSTANCE hInstance = NULL;
-	GHLMainWindow * pWnd = nullptr;
+	GHLMainWindow * pMainWnd = nullptr;
+	CGHLProcPicker * ghlProcPicker = nullptr;
 };
 

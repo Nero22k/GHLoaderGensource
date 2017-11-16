@@ -9,8 +9,11 @@ GHLGen::GHLGen(HINSTANCE hInstance)
 	GetWindowRect(GetDesktopWindow(), &rc);
 	int x = rc.right - ((rc.right - rc.left) / 2) - (GHL_WND_W / 2);
 	int y = (rc.bottom / 2) - GHL_WND_H / 2;
-	pWnd = new GHLMainWindow(hInstance, x, y);
-	vWindows.push_back(pWnd);
+	pMainWnd = new GHLMainWindow(hInstance, x, y);
+	vWindows.push_back(pMainWnd);
+
+	ghlProcPicker = new CGHLProcPicker(pMainWnd);
+	//ghlProcPicker->Show();
 }
 
 

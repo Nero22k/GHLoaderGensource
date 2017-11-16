@@ -8,12 +8,21 @@ CXLabel::CXLabel(CXWindow * pOwner, XID xID, int x, int y, int w, int h, tstring
 	szClass = _T("STATIC");
 	SetStyle(WS_XLABEL);
 	dwFlags = DT_NOCLIP;
+	rcRect.left = x;
+	rcRect.right = x + w;
+	rcRect.top = y;
+	rcRect.bottom = y + h;
 }
 
 
 CXLabel::~CXLabel()
 {
-}/*
+}
+bool CXLabel::Create()
+{
+	return CXControl::Create();
+}
+/*
 
 bool CXLabel::Create()
 {
@@ -29,14 +38,11 @@ bool CXLabel::Create()
 LRESULT CXLabel::OnDrawItem(WPARAM wParam, LPARAM lParam)
 {
 	DRAWITEMSTRUCT* pDi = (DRAWITEMSTRUCT*)lParam;
-	FillRect(pDi->hDC, &rcRect, hBgr);
 	SetTextColor(pDi->hDC, clText);
 	SetBkMode(pDi->hDC, TRANSPARENT);
 	if (pFont)
 		pFont->SetFont(pDi->hDC);
 
-	AdjustWindowRect(&GetRect(), WS_VISIBLE, FALSE);
-	rcRect.left -= 5;
 	DrawText(pDi->hDC, szText.c_str(), szText.length(), &rcRect, dwFlags);
 	return 0;
 }
