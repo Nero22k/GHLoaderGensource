@@ -20,7 +20,14 @@ CXLabel::~CXLabel()
 }
 bool CXLabel::Create()
 {
-	return CXControl::Create();
+	bool bRet = CXControl::Create();
+	if (bRet)
+	{
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG)this);
+		SetWindowSubclass(hWnd, OwnerDrawProc, 0, 0);
+		SetText(szText);
+	}
+	return bRet;
 }
 /*
 

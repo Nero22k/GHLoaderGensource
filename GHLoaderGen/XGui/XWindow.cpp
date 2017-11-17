@@ -201,6 +201,11 @@ HANDLE CXWindow::GetBackground()
 	return hBgr;
 }
 
+tstring CXWindow::GetText()
+{
+	return this->szText;
+}
+
 void CXWindow::SetOwnerWindow(CXWindow * pWindow)
 {
 	this->pOwnerWindow = pWindow;
@@ -213,7 +218,7 @@ void CXWindow::SetBgColor(COLORREF clColor)
 		DeleteObject(hBgr);
 
 	hBgr = CreateSolidBrush(clColor);
-	SetClassLong(hWnd, GCL_HBRBACKGROUND, (LONG)hBgr);
+	SetClassLongPtr(hWnd, GCLP_HBRBACKGROUND, (LONG)hBgr);
 	InvalidateRect(hWnd, NULL, TRUE);
 }
 
@@ -270,6 +275,7 @@ void CXWindow::SetText(tstring szText)
 {
 	this->szText = szText;
 	SendMessage(this->hWnd, WM_SETTEXT, 0, (LPARAM)szText.c_str());
+	RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
 }
 
 void CXWindow::SetPos(int x, int y)

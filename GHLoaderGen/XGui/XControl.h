@@ -39,6 +39,7 @@ public:
 	virtual LRESULT OnCtlColor(WPARAM wParam, LPARAM lParam);
 	virtual void OnHover(POINT p);
 	virtual void OnHScroll(WPARAM wParam, LPARAM lParam);
+	virtual void OnPaint(WPARAM wParam, LPARAM lParam);
 
 protected:
 	ECXControl ControlType;

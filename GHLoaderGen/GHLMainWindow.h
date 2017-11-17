@@ -49,7 +49,15 @@
 #define IDRDO_FAKEPEH		0x9003
 #define IDCHK_ULNKPEB		0x9004
 
-
+enum EBTN_COMMANDS : uintptr_t
+{
+	SELECT_PROCESS,
+	SELECT_DLL,
+	SELECT_README,
+	SELECT_BUILD,
+	SELECT_GH
+};
+typedef EBTN_COMMANDS ebc;
 
 class GHLMainWindow : public CXMainWindow
 {
@@ -57,10 +65,15 @@ public:
 	GHLMainWindow(HINSTANCE hInstance, int x, int y);
 	~GHLMainWindow();
 	void SelectProcess();
-
+	void ProcessSelected();
+	void SelectDll();
+	void SelectReadme();
+	void LaunchGH();
+	void GenerateLoader();
 private:
 	int CreateControls();
 	CGHLProcPicker * pProcPicker = nullptr;
-	CProcess targetProc;
+	CProcess *targetProc;
 };
 
+void ProcPickerCallback();

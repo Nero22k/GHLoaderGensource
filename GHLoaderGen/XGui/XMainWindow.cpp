@@ -161,8 +161,8 @@ bool CXMainWindow::Create()
 
 void CXMainWindow::OnPaint()
 {
-	if((HBRUSH)GetClassLong(hWnd, GCL_HBRBACKGROUND) != hBgr)	//
-		SetClassLong(hWnd, GCL_HBRBACKGROUND, (LONG)hBgr);		// i don't think i even need this... 
+	if((HBRUSH)GetClassLongPtr(hWnd, GCLP_HBRBACKGROUND) != hBgr)	//
+		SetClassLongPtr(hWnd, GCLP_HBRBACKGROUND, (LONG)hBgr);		// i don't think i even need this... 
 	
 	PAINTSTRUCT ps;
 	HDC hdc = BeginPaint(hWnd, &ps);

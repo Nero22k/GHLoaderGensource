@@ -1,9 +1,15 @@
 #include "GHLProcPicker.h"
 #include "XGui\XControls.h"
 
-CGHLProcPicker::CGHLProcPicker(CXWindow* pMainWindow)
-	: CXDialog(pMainWindow, 1, pMainWindow->GetRect().right, pMainWindow->GetRect().top, 600,350, _T("Proc'Picker"))
+void BtnCallback_SelectProcess(uintptr_t pProcPicker)
 {
+	reinterpret_cast<CGHLProcPicker*>(pProcPicker)->SelectProcess();
+}
+
+CGHLProcPicker::CGHLProcPicker(CXWindow* pMainWindow, CProcess * procTarget)
+	: CXDialog(pMainWindow, 0x0990, pMainWindow->GetRect().right, pMainWindow->GetRect().top, 600,350, _T("Proc'Picker"))
+{
+	this->procTarget = &procTarget;
 }
 
 
@@ -15,36 +21,31 @@ void CGHLProcPicker::Show()
 {
 	if (!hWnd)
 		Init();
-	ShowWindow(hWnd, SW_SHOW);
-	//CXDialog::Show();
+
 	auto xLV = xControls->GetControl<CXListView>(IDLIST1);
 	ListView_DeleteAllItems(xLV->GetHandle());
 	FillList();
+	ShowWindow(hWnd, SW_SHOW);
 	bShown = true;
 }
 
 void CGHLProcPicker::FillList()
 {
 	//to do
-	// enumerate open processes, should probably spawn processes to do this
+	// enumerate open processes, should probably spawn processes to do this (oooorrrr NOT XD)
 	// load binary icon from resource, also implement reading resource from binary in resmanager class
 	// list sorting, by arch, name (A-Z || Z-A), pid, process start time or duration running might be nice too
 
-
-	//CXListViewItem listItem = CXListViewItem(0, 0, L"TEST");
-	//listItem.AddSubItem(0, 1, L"FUCK");		
-	//auto xLV = xControls->GetControl<CXListView>(IDLIST1);
-	//xLV->AddItem(listItem);
-
-	//RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
 	procManager.LoadProcs();
 	int x = 0;
 	tstring pid(22, 0);
 	ProcVec pv = procManager.GetProcs();
+	//HICON hApp = LoadIcon(NULL, IDI_APPLICATION);
 	for (auto p : pv)
 	{
-		CXListViewItem listItem = CXListViewItem(x, 0, L"");
-		listItem.AddSubItem(x, 1, L"IDK");		
+		HICON i = p->GetIcon();
+		CXListViewItem listItem = CXListViewItem(x, 0, L"", (i) ? i : hIcon);
+		listItem.AddSubItem(x, 1, (p->Is64Bit()) ? L"x64" : L"x86");		
 		listItem.AddSubItem(x, 2, p->GetProcName());
 		_itow_s(p->GetPID(), &pid[0], 22, 10);
 		listItem.AddSubItem(x, 3, pid);
@@ -53,6 +54,7 @@ void CGHLProcPicker::FillList()
 		xLV->AddItem(listItem);
 		x++;
 	}
+	//DestroyIcon(hApp);
 }
 
 void CGHLProcPicker::Init()
@@ -60,7 +62,8 @@ void CGHLProcPicker::Init()
 	Create();
 	GetRect();
 	xControls = new CXControls(this);
-	xControls->AddControl<CXListView>(IDLIST1, 15, 15, 550, rcRect.bottom - 35, _T(" "));
+
+	xControls->AddControl<CXListView>(IDLIST1, 15, 15, 550, rcRect.bottom/* - 35*/, _T(" "));
 	CXListView* list = xControls->GetControl<CXListView>(IDLIST1);
 	list->SetColumnWidth(0, 32);
 	list->InsertColumn(_T("Arch"), 48, LVCFMT_CENTER);
@@ -68,8 +71,36 @@ void CGHLProcPicker::Init()
 	list->InsertColumn(_T("PID"), 48, LVCFMT_CENTER);
 	list->InsertColumn(_T("Path"), uWidth/2);
 
-	RECT rc = list->GetRect();
-	xControls->AddControl<CXButton>(IDBUTTON1, 15, rcRect.bottom - 5, rc.right - rc.left, 25, _T("Select Process"));
+	//xControls->AddControl<CXButton>(IDLBL_REFRESH, 15, 240, 120, 25, L"Refresh");
 
+	RECT rc = list->GetRect();
+	CXButton * pBtn = xControls->AddControl<CXButton>(IDBUTTON1, 15, 275, rc.right - rc.left, 25, _T("Select Process"));
+	std::function<void(uintptr_t)> bc = BtnCallback_SelectProcess;
+	pBtn->SetAction(bc);
+	pBtn->SetCommandArgs((uintptr_t)this);
 	procManager.LoadProcs();
+}
+
+void CGHLProcPicker::SelectProcess()
+{
+	CXListView* pLV = xControls->GetControl<CXListView>(IDLIST1);
+	int selectmark = ListView_GetSelectionMark(pLV->GetHandle()); //sigh...
+	*procTarget = procManager.GetProcs().at(selectmark);
+	ppc();
+	this->Destroy();
+}
+
+void CGHLProcPicker::Destroy()
+{
+	CXDialog::Destroy();
+}
+
+void CGHLProcPicker::SetProcPickerCallback(std::function<void()> ppc)
+{
+	this->ppc = ppc;
+}
+
+CProcess * CGHLProcPicker::GetSelectedProcess()
+{
+	return *procTarget;
 }

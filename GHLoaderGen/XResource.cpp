@@ -11,7 +11,7 @@ CXResource::~CXResource()
 
 void * CXResource::GetPtrToData(DWORD dwID, DWORD dwType)
 {
-	hRsrc = FindResource(hInstance, MAKEINTRESOURCE(dwID), MAKEINTRESOURCE(dwType));
+	hRsrc = FindResourceEx(hInstance, MAKEINTRESOURCE(dwType), MAKEINTRESOURCE(dwID), DEFLANGID);
 	if (!hRsrc)
 		return nullptr;
 
@@ -23,7 +23,13 @@ void * CXResource::GetPtrToData(DWORD dwID, DWORD dwType)
 	pResource = LockResource(hGlobal);
 	if (pResource)
 		return pResource;
+	
 	return nullptr;
+}
+
+DWORD CXResource::GetSize()
+{
+	return size;
 }
 
 CResourceWriter::CResourceWriter(HINSTANCE hInstance)

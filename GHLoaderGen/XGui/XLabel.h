@@ -9,6 +9,7 @@ public:
 	CXLabel(CXWindow * pOwner, XID xID, int x, int y, int w, int h, tstring szText, CXFont * pFont = nullptr);
 	~CXLabel();
 	virtual bool Create();
+	//virtual void OnPaint(WPARAM wParam, LPARAM lParam);
 	virtual LRESULT OnDrawItem(WPARAM wParam, LPARAM lParam);
 	//virtual LRESULT OnCtlColor(WPARAM wParam, LPARAM lParam);
 

@@ -75,7 +75,7 @@ bool CXOwnerDrawControl::Create()
 	bool ret = CreateXWindow();
 	if (ret)
 	{
-		SetWindowLong(hWnd, GWL_USERDATA, (LONG)this);
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG)this);
 		SetWindowSubclass(hWnd, OwnerDrawProc, 0, 0);
 	}
 	return ret;
@@ -99,9 +99,12 @@ void CXOwnerDrawControl::SetText(tstring szText)
 
 LRESULT CXOwnerDrawControl::OnDrawItem(WPARAM wParam, LPARAM lParam)
 {
-	LPDRAWITEMSTRUCT lpDI = (LPDRAWITEMSTRUCT)lParam;
-	HTHEME hTheme = OpenThemeData(hWnd, WC_BUTTON);
-	Draw(hTheme, lpDI);
+	if (wParam && lParam)
+	{
+		LPDRAWITEMSTRUCT lpDI = (LPDRAWITEMSTRUCT)lParam;
+		HTHEME hTheme = OpenThemeData(hWnd, WC_BUTTON);
+		Draw(hTheme, lpDI);
+	}
 	return 0;
 }
 
@@ -220,7 +223,7 @@ void CXOwnerDrawControl::Draw(HTHEME hTheme, LPDRAWITEMSTRUCT lpDI)
 	dtbgOpts.dwFlags |= DTBG_VALIDBITS;
 	dtbgOpts.rcClip = rcBG;
 
-	SelectBrush(lpDI->hDC, GetStockObject(HOLLOW_BRUSH));
+	SelectBrush(lpDI->hDC, hBgr);	
 	DrawThemeBackgroundEx(hTheme, lpDI->hDC, bp, rbState, &rcBG, &dtbgOpts);
 	GetThemeBackgroundContentRect(hTheme, lpDI->hDC, bp, rbState, &rcBG, &rcRect);
 	if (ControlType == GROUPBOX)

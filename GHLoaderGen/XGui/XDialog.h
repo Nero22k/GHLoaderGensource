@@ -16,6 +16,7 @@ public:
 	virtual bool Create();
 	virtual void Show();
 	virtual void Destroy();
+	virtual CXControls* GetControls();
 protected:
 	CXControls* xControls;
 	XDialogID xDialogID;

@@ -40,6 +40,7 @@ public:
 	virtual DWORD GetStyle();
 	virtual RECT & GetWndRect();
 	virtual HANDLE GetBackground();
+	virtual tstring GetText();
 
 	virtual void SetOwnerWindow(CXWindow* pWindow);
 	virtual void SetBgColor(COLORREF clColor);

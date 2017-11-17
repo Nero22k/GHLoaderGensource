@@ -12,7 +12,7 @@ GHLGen::GHLGen(HINSTANCE hInstance)
 	pMainWnd = new GHLMainWindow(hInstance, x, y);
 	vWindows.push_back(pMainWnd);
 
-	ghlProcPicker = new CGHLProcPicker(pMainWnd);
+	//ghlProcPicker = new CGHLProcPicker(pMainWnd);
 	//ghlProcPicker->Show();
 }
 

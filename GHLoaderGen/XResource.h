@@ -11,7 +11,7 @@ public:
 
 public:
 	void * GetPtrToData(DWORD dwID, DWORD dwType);
-
+	DWORD GetSize();
 protected:
 	HINSTANCE hInstance;
 	HRSRC hRsrc = NULL;

@@ -15,6 +15,7 @@ class CXFileDialogFilterEntry
 public:
 	CXFileDialogFilterEntry(tstring szDesc, tstring szExt);
 	std::vector<TCHAR>& GetData();
+	void AddEntry(tstring szDesc, tstring szExt);
 private:
 	void BuildVector();
 private:

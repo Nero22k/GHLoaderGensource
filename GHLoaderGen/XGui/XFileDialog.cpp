@@ -4,7 +4,7 @@ CXFileDialog::CXFileDialog(CXWindow * pOwner, EXFILEDIALOGMODE dialogMode, CXFil
 {
 	this->pOwner = pOwner;
 	this->fdMode = dialogMode;
-	this->szFilter.resize(szFilter.size());
+	this->szFilter.resize(pFilter->GetData().size());
 	memcpy(&this->szFilter[0], &szFilter[0], szFilter.size());
 	szFileName.resize(MAX_PATH);
 	ofn = { 0 };
@@ -47,9 +47,7 @@ tstring CXFileDialog::GetFileName()
 
 CXFileDialogFilterEntry::CXFileDialogFilterEntry(tstring szDesc, tstring szExt)
 {
-	this->szDesc = szDesc;
-	this->szExt = szExt;
-	BuildVector();
+	AddEntry(szDesc, szExt);
 }
 
 std::vector<TCHAR>& CXFileDialogFilterEntry::GetData()
@@ -57,8 +55,18 @@ std::vector<TCHAR>& CXFileDialogFilterEntry::GetData()
 	return vData;
 }
 
+void CXFileDialogFilterEntry::AddEntry(tstring szDesc, tstring szExt)
+{
+	this->szDesc = szDesc;
+	this->szExt = szExt;
+	BuildVector();
+}
+
 void CXFileDialogFilterEntry::BuildVector()
 {
+	if (!vData.empty())
+		vData.resize(vData.size() - 1);
+
 	 //"All Files(*.*)"
 	for (auto c : szDesc)
 		vData.push_back(c);
@@ -72,6 +80,5 @@ void CXFileDialogFilterEntry::BuildVector()
 
 	// "All Files(*.*)\0*.*\0\0"
 	for(int x = 0; x < 2; x++)
-		for (int y = 0; y < sizeof(TCHAR); y++)
-			vData.push_back(0);
+		vData.push_back(0);
 }

@@ -21,6 +21,14 @@ public:
 	tstring GetProcName();
 	tstring GetProcPath();
 	DWORD GetPID();
+	HICON GetIcon();
+	bool Is64Bit();
+	
+private:
+	void Start();
+	void FindProcPath();
+	void FindIcon();
+
 private:
 	PROCESSENTRY32 pe32;
 	HANDLE hHandle = NULL;
@@ -29,5 +37,6 @@ private:
 	DWORD dwPID = -1;
 	bool is32bit;
 	CProcessTimes cpTimes{ 0 };
+	HICON hIcon = NULL;
 };
 

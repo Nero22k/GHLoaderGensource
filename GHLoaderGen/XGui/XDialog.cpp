@@ -20,6 +20,23 @@ LRESULT CALLBACK DialogWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 				}
 			}
 		}
+		case WM_COMMAND:
+		{
+			int id = LOWORD(wParam);
+			if (mDialogsH[hWnd])
+				if(mDialogsH[hWnd]->GetControls()->mControls[id])
+					mDialogsH[hWnd]->GetControls()->mControls[id]->OnCommand(wParam, lParam);
+			return 0;
+		}
+		case WM_DRAWITEM:
+		{		
+			if (mDialogsH[hWnd]->GetControls())
+			{
+				if (mDialogsH[hWnd]->GetControls()->mControls[wParam])
+					return mDialogsH[hWnd]->GetControls()->mControls[wParam]->OnDrawItem(wParam, lParam);
+			}
+			break;
+		}
 		case WM_DESTROY:
 		case WM_CLOSE:
 		{
@@ -43,6 +60,8 @@ CXDialog::CXDialog(CXWindow * pOwner, XID xID, int x, int y, int w, int h, tstri
 	SetWidth(w);
 	SetHeight(h);
 	SetBgColor(pOwner->GetBackgroundColor());
+	this->hIcon = pOwnerWindow->GetIcon();
+	this->hIconSm = pOwnerWindow->GetIconSm();
 }
 
 CXDialog::~CXDialog()
@@ -78,4 +97,9 @@ void CXDialog::Destroy()
 {
 	ShowWindow(hWnd, SW_HIDE);
 	bShown = false;
+}
+
+CXControls* CXDialog::GetControls()
+{
+	return xControls;
 }

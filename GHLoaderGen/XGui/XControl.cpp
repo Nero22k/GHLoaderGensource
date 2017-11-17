@@ -14,6 +14,7 @@ CXControl::CXControl(CXWindow * pOwner, XID xID, ECXControl ControlType, int x, 
 	this->ControlType = ControlType;
 	this->pFont = pFont;
 	this->pOwnerWindow = pOwner;
+	hOwner = pOwner->GetHandle();
 	SetText(szText);
 	RECT rc;
 	rc.left = x;
@@ -22,6 +23,7 @@ CXControl::CXControl(CXWindow * pOwner, XID xID, ECXControl ControlType, int x, 
 	rc.bottom = y + h;
 	SetRect(rc);
 	hBgr = (HBRUSH)pOwner->GetBackground();
+	clBgr = pOwner->GetBackgroundColor();
 }
 
 CXControl::~CXControl()
@@ -99,6 +101,10 @@ void CXControl::OnHover(POINT p)
 }
 
 void CXControl::OnHScroll(WPARAM wParam, LPARAM lParam)
+{
+}
+
+void CXControl::OnPaint(WPARAM wParam, LPARAM lParam)
 {
 }
 
