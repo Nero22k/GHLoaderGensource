@@ -1,4 +1,5 @@
 #include "GHLMainWindow.h"
+#include "Binary.h"
 
 GHLMainWindow * g_pMain = nullptr;
 
@@ -17,6 +18,9 @@ void BtnCallback(uintptr_t iCommand)
 			break;
 		case SELECT_GH:
 			g_pMain->LaunchGH();
+			break;
+		case SELECT_BUILD:
+			g_pMain->GenerateLoader();
 			break;
 	}
 }
@@ -68,9 +72,11 @@ void GHLMainWindow::ProcessSelected()
 	pL->SetText(pid);
 	bool b64 = targetProc->Is64Bit();
 	pL = pC->GetControl<CXLabel>(IDLBL_ARCH);
-	tstring arch = pL->GetText();
+	tstring arch = _T("Arch: ");
 	arch += (b64) ? _T("x64") : _T("x86");
 	pL->SetText(arch);
+
+	pC->GetControl<CXIcon>(0x1111)->Load(targetProc->GetIcon());
 	RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
 }
 
@@ -86,7 +92,7 @@ void GHLMainWindow::SelectDll()
 void GHLMainWindow::SelectReadme()
 {
 	CXFileDialogFilterEntry fe(L"Text file | (*.txt)", L"*.txt");
-	CXFileDialog fd(this, OPEN, &fe);
+	CXFileDialog fd(this, OPEN, &fe); 
 	tstring szPath;
 	if (fd.Show(szPath))
 		pControls->GetControl<CXEdit>(IDEDT_README)->SetText(szPath);
@@ -101,10 +107,48 @@ void GHLMainWindow::LaunchGH()
 void GHLMainWindow::GenerateLoader()
 {
 	//first we need to check if everything is good to go
-	//check if 
-	//then we need to generate our resources
-	//write appropriate binary to disk
-	//write resources into binary
+	//check if there's a process selected and a dll ready to load
+	if (!targetProc)
+	{
+		MessageBox(hWnd, _T("Please select a process..."), _T("Yo dumbass!"), MB_ICONERROR | MB_OK);
+		return;
+	}
+
+
+	if (!lstrcmp(pControls->GetControl<CXEdit>(IDEDT_DLLPATH)->GetText().c_str(), L""))
+	{
+		MessageBox(hWnd, _T("Might help if you select a dll to load..."), _T("Yo dumbass!"), MB_ICONERROR | MB_OK);
+		return;
+	}
+
+	//setup struct that'll basically be our resource that allows us to configure our loader however we please
+	LoaderInfo li;
+	GetLoaderInfo(li);
+
+	CBinary dll(pControls->GetControl<CXEdit>(IDEDT_DLLPATH)->GetText());
+
+	//check if dll even exists...
+	if (!dll.Exists())
+	{
+		MessageBox(NULL, L"Invalid path to dll!", L"Error!", MB_ICONERROR | MB_OK);
+		return;
+	}
+
+	//check if dll matches arch of selected process
+	if (targetProc->Is64Bit() != dll.Is64BitImage())
+	{
+		MessageBox(NULL, L"Architecture of DLL does not match that of the game!", L"Error!", MB_ICONERROR | MB_OK);
+		return;
+	}
+	
+	CXFileDialogFilterEntry fdf(L"Executable | (*.exe)", L"*.exe");
+	CXFileDialog fd(this, SAVE, &fdf);
+	tstring filepath;
+	fd.Show(filepath);
+
+	//generate loader :D
+	pGen = new CLoaderGen(&dll.GetPath(), &pControls->GetControl<CXEdit>(IDEDT_README)->GetText());
+	pGen->Generate(filepath, &li, dll.Is64BitImage());
 }
 
 int GHLMainWindow::CreateControls()
@@ -149,12 +193,13 @@ int GHLMainWindow::CreateControls()
 	pC = pGb->pControls;
 	pCtrl = pC->AddControl<CXLabel>(IDLBL_PROCNAME, 10, 23, 40, 25, L"Name:");
 
-
 	//pC->AddGroup(IDGRP_PROCESS);
 	//pC->AddControlToGroup<CXLabel>(IDGRP_PROCESS, IDLBL_PROCNAME, 10, 23, 40, 25, L"Name:");
 	pC->AddControl<CXEdit>(IDEDT_PROCNAME, 65, 20, 120, 25, L"ac_client.exe");
 	pCtrl = pC->AddControl<CXLabel>(IDLBL_PID, 10, 55, 60, 25, L"PID: ");
 	pCtrl = pC->AddControl<CXLabel>(IDLBL_ARCH, 10, 85, 60, 25, L"Arch: ");
+	auto pIco = pC->AddControl<CXIcon>(0x1111, 120, 60, 32, 32, L" ");
+	pIco->Load(LoadIcon(NULL, MAKEINTRESOURCE(IDI_ERROR)));
 
 	pBtn = pControls->AddControl<CXButton>(IDBTN_PROCSELECT, 14, DIV + 130, 190, 25, L"Select Process");
 	pProcPicker = new CGHLProcPicker(this, targetProc);
@@ -175,13 +220,19 @@ int GHLMainWindow::CreateControls()
 	pC->AddControlToGroup<CXRadioButton>(IDGRP_INJSET, IDRDO_LDRLOAD, 125, 20, 125, 25, L"LdrLoadDll");
 	pC->AddControlToGroup<CXRadioButton>(IDGRP_INJSET, IDRDO_MANMAP, 235, 20, 125, 25, L"Manual Map");
 	pC->AddControlToGroup<CXCheckBox>(IDGRP_INJSET, IDCHK_THIJACK, 10, 50, 150, 25, L"Thread Hijacking");
+	pC->AddControlToGroup<CXCheckBox>(IDGRP_INJSET, IDCHK_HIDEDBG, 160, 50, 175, 25, L"Hide from Debugger");
 
-	pC->AddGroup(IDGRP_INJPOST);
-	pC->AddControlToGroup<CXRadioButton>(IDGRP_INJPOST, IDRDO_KEEPPEH, 10, 90, 125, 25, L"Keep PEH");
-	pC->vGroups[IDGRP_INJPOST]->GetControl<CXRadioButton>(IDRDO_KEEPPEH)->SetCheck(true);
-	pC->AddControlToGroup<CXRadioButton>(IDGRP_INJPOST, IDRDO_ERASEPEH, 125, 90, 125, 25, L"Erase PEH");
-	pC->AddControlToGroup<CXRadioButton>(IDGRP_INJPOST, IDRDO_FAKEPEH, 235, 90, 125, 25, L"Fake PEH");
-	pC->AddControlToGroup<CXCheckBox>(IDGRP_INJPOST, IDCHK_ULNKPEB, 10, 115, 150, 25, L"Unlink from PEB");
+	CXCheckBox * pChckBox = pC->vGroups[IDGRP_INJSET]->GetControl<CXCheckBox>(IDCHK_HIDEDBG);
+	pChckBox->Disable(true);
+
+	CXComboBox* pCB = pC->AddControl<CXComboBox>(IDCBX_PEH, 10, 90, 125, 25, L"Keep PEH");
+	pCB->SetStyle(WS_XCOMBOBOXDROPLIST);
+	pCB->AddString(L"Erase PEH");
+	pCB->AddString(L"Fake PEH");
+
+	pC->AddControlToGroup<CXCheckBox>(IDGRP_INJSET, IDCHK_ULNKPEB, 10, 115, 150, 25, L"Unlink from PEB");
+	pC->AddControlToGroup<CXCheckBox>(IDGRP_INJSET, IDCHK_SHIFT, 160, 95, 175, 25, L"Shift Module");
+	pC->AddControlToGroup<CXCheckBox>(IDGRP_INJSET, IDCHK_CDDIR, 160, 115, 175, 25, L"Clean Data Directories");
 	pCtrl = pC->AddControl<CXLabel>(IDLBL_DELAY, 50, 148, 100, 25, L"Delay: ");
 	pCtrl->SetTxtColor(RGB(200, 200, 200));
 	pCtrl = pC->AddControl<CXEdit>(IDEDT_DELAY, 120, 145, 200, 25, L"0");
@@ -191,7 +242,9 @@ int GHLMainWindow::CreateControls()
 	pControls->AddControl<CXCheckBox>(IDCHK_RANDNAMES, 10, DIV + 160, 180, 25, L"Randomize File Names");
 	pControls->AddControl<CXCheckBox>(IDCHK_UPXFILES, 10, DIV + 180, 180, 25, L"UPX Everything");
 
-	pControls->AddControl<CXButton>(IDBTN_BUILD, 10, DIV + 210, 510, 25, L"Generate Loader!");
+	pBtn = pControls->AddControl<CXButton>(IDBTN_BUILD, 10, DIV + 210, 510, 25, L"Generate Loader!");
+	pBtn->SetAction(bc);
+	pBtn->SetCommandArgs(SELECT_BUILD);
 	pBtn = pControls->AddControl<CXButton>(IDBTN_GH, 530, DIV + 210, 40, 25, L"");	
 	pBtn->SetIcon(hIcon);
 	pBtn->SetAction(bc);
@@ -200,6 +253,50 @@ int GHLMainWindow::CreateControls()
 	RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
 
 	return 0;
+}
+
+void GHLMainWindow::GetLoaderInfo(LoaderInfo & li)
+{
+	//form info
+	CXGroupBox* pGB = pControls->GetControl<CXGroupBox>(IDGRP_LOADSET);
+	
+	li.formInfo.szFormTitle = WCS2MBS(pGB->pControls->GetControl<CXEdit>(IDEDT_FORMNAME)->GetText());
+	li.formInfo.uFormTitleLen = li.formInfo.szFormTitle.length();
+	li.formInfo.szGameTitle = WCS2MBS(pGB->pControls->GetControl<CXEdit>(IDEDT_GAMENAME)->GetText());
+	li.formInfo.uGameTitleLen = li.formInfo.szGameTitle.length();
+	li.formInfo.szAuthor = WCS2MBS(pGB->pControls->GetControl<CXEdit>(IDEDT_AUTHOR)->GetText());
+	li.formInfo.uAuthorLen = li.formInfo.szAuthor.length();
+
+	// loader settings
+	pGB = pControls->GetControl<CXGroupBox>(IDGRP_PROCESS);
+	li.loadSettings.szProcessName = WCS2MBS(pGB->pControls->GetControl<CXEdit>(IDEDT_PROCNAME)->GetText());
+	li.loadSettings.uProcNameLen = li.loadSettings.szProcessName.length();
+	li.loadSettings.bRandomNames = pControls->GetControl<CXCheckBox>(IDCHK_RANDNAMES)->GetCheck();
+	li.loadSettings.bUPX = pControls->GetControl<CXCheckBox>(IDCHK_UPXFILES)->GetCheck();
+
+	//inj settings
+	pGB = pControls->GetControl<CXGroupBox>(IDGRP_INJSET);
+	CXControls* pC = pGB->pControls->vGroups[IDGRP_INJSET];
+	
+	int injMethod = 0;
+	
+	if (pC->GetControl<CXRadioButton>(IDRDO_LDRLOAD)->GetCheck())
+		injMethod = 1;
+	else if (pC->GetControl<CXRadioButton>(IDRDO_MANMAP)->GetCheck())
+		injMethod = 2;
+
+	li.injSettings.iInjMethod = injMethod;
+	pGB->pControls->vGroups[IDGRP_INJSET]->GetControl<CXCheckBox>(IDRDO_LOADLIB);
+	// todo: need to get figure out which radio button in the group is selected
+	int pehMethod = pGB->pControls->GetControl<CXComboBox>(IDCBX_PEH)->GetSelectedIndex();
+
+	li.injSettings.iPEHMethod = pehMethod;
+	li.injSettings.bThreadHiJack = pC->GetControl<CXCheckBox>(IDCHK_THIJACK)->GetCheck();
+	li.injSettings.bUnlinkPEB = pC->GetControl<CXCheckBox>(IDCHK_ULNKPEB)->GetCheck();
+
+
+	tstring buf = pGB->pControls->GetControl<CXEdit>(IDEDT_DELAY)->GetText();
+	li.injSettings.iDelay = _ttoi(buf.c_str());
 }
 
 void ProcPickerCallback()

@@ -1,7 +1,7 @@
 #pragma once
 #include "XControl.h"
 
-#define WS_XLISTVIEW WS_CHILD | LVS_REPORT | LVS_EDITLABELS
+#define WS_XLISTVIEW WS_CHILD | LVS_REPORT | LVS_ICON | LVS_EDITLABELS
 
 class CXListViewItem
 {
@@ -16,8 +16,9 @@ public:
 	CXListViewItem() = default;
 	CXListViewItem(int iItem, int iSubItem, tstring szText);
 	CXListViewItem(int iItem, int iSubItem, tstring szText, HICON hIcon);
+	~CXListViewItem();
 
-	LVITEM& GetItem();
+	LVITEM GetItem();
 	std::vector<CXListViewItem*> GetSubItems();
 	void AddSubItem(int iItem, int iSubItem, tstring szText);
 	CXListViewItem* GetSubItem(int iSubItem);
@@ -41,6 +42,8 @@ public:
 	void SetColumnWidth(int iColumn, int width);
 	bool AddItem(int iItem, int iSubItem);
 	bool AddItem(CXListViewItem & xListViewItem);
+	int GetSelectedIndex();
+	void SetIconList();
 private:
 	int iCol = 0;
 	std::map<int, CXListViewItem> mListItems;

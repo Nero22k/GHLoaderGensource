@@ -225,7 +225,8 @@ void CXWindow::SetBgColor(COLORREF clColor)
 void CXWindow::SetStyle(DWORD dwStyle)
 {
 	this->dwStyle = dwStyle;
-	SetWindowLong(hWnd, GWL_STYLE, dwStyle);
+	SetWindowLongPtr(hWnd, GWL_STYLE, dwStyle);
+	RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
 }
 
 void CXWindow::SetClass(tstring szClass)
@@ -271,9 +272,19 @@ void CXWindow::SetWndProc(WNDPROC WndProc)
 	SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG)WndProc);
 }
 
+void CXWindow::Clear()
+{//paint background color to window
+	PAINTSTRUCT ps;
+	HDC hdc = BeginPaint(hWnd, &ps);
+	FillRect(hdc, &rcRect, hBgr);
+	EndPaint(hWnd, &ps);
+}
+
 void CXWindow::SetText(tstring szText)
 {
+	//Clear();
 	this->szText = szText;
+	SendMessage(this->hWnd, WM_CLEAR, 0, 0);
 	SendMessage(this->hWnd, WM_SETTEXT, 0, (LPARAM)szText.c_str());
 	RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
 }

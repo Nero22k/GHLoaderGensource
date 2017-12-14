@@ -86,6 +86,7 @@ int CXOwnerDrawControl::OnCommand(WPARAM wParam, LPARAM lParam)
 	if (HIWORD(wParam) == BN_CLICKED)
 	{
 		bChecked = !bChecked;
+		SetFocus(hWnd);
 	}
 
 	return 0;
@@ -122,8 +123,11 @@ void CXOwnerDrawControl::RedrawCheck()
 
 void CXOwnerDrawControl::SetCheck(bool bCheck)
 {
-	this->bChecked = bCheck;
-	RedrawCheck();
+	if (!bDisabled)
+	{
+		this->bChecked = bCheck;
+		RedrawCheck();
+	}
 }
 
 bool CXOwnerDrawControl::GetCheck()
@@ -133,13 +137,21 @@ bool CXOwnerDrawControl::GetCheck()
 
 void CXOwnerDrawControl::ToggleCheck()
 {
-	bChecked = !bChecked;
-	RedrawCheck();
+	if (!bDisabled)
+	{
+		bChecked = !bChecked;
+		RedrawCheck();
+	}
 }
 
 void CXOwnerDrawControl::SetHot(bool isHot)
 {
 	this->bHot = isHot;
+}
+
+void CXOwnerDrawControl::Disable(bool bDisable)
+{
+	this->bDisabled = bDisable;
 }
 
 //for radios and checkboxes
@@ -150,7 +162,7 @@ void CXOwnerDrawControl::DetermineTypeAndState(int & iButtonPart, DWORD & dwStat
 	{
 		case RADIO:
 			iButtonPart = BP_RADIOBUTTON;
-			if (bChecked)
+			if (bChecked && !bDisabled)
 			{
 				dwState = RBS_CHECKEDNORMAL;
 			}
@@ -158,13 +170,13 @@ void CXOwnerDrawControl::DetermineTypeAndState(int & iButtonPart, DWORD & dwStat
 			{
 				dwState = RBS_UNCHECKEDNORMAL;
 			}
-			if (bHot)
+			if (bHot && !bDisabled)
 				dwState |= RBS_HOT;
 			break;
 
 		case CHECKBOX:
 			iButtonPart = BP_CHECKBOX;
-			if (bChecked)
+			if (bChecked && !bDisabled)
 			{
 				dwState = CBS_CHECKEDNORMAL;
 			}
@@ -172,7 +184,7 @@ void CXOwnerDrawControl::DetermineTypeAndState(int & iButtonPart, DWORD & dwStat
 			{
 				dwState = CBS_UNCHECKEDNORMAL;
 			}
-			if (bHot)
+			if (bHot && !bDisabled)
 				dwState |= CBS_HOT;
 			break;
 
@@ -224,8 +236,16 @@ void CXOwnerDrawControl::Draw(HTHEME hTheme, LPDRAWITEMSTRUCT lpDI)
 	dtbgOpts.rcClip = rcBG;
 
 	SelectBrush(lpDI->hDC, hBgr);	
+	RECT rc = rcBG;
+	rc.left += 1;
+	rc.right -= 1;
+	rc.top += 1;
+	rc.bottom -= 1;
+
 	DrawThemeBackgroundEx(hTheme, lpDI->hDC, bp, rbState, &rcBG, &dtbgOpts);
 	GetThemeBackgroundContentRect(hTheme, lpDI->hDC, bp, rbState, &rcBG, &rcRect);
+	
+	
 	if (ControlType == GROUPBOX)
 	{
 		COLORREF clBgr = GetOwnerWindow()->GetBackgroundColor();
@@ -239,7 +259,21 @@ void CXOwnerDrawControl::Draw(HTHEME hTheme, LPDRAWITEMSTRUCT lpDI)
 
 	DTTOPTS dtOpts{ 0 };
 	dtOpts.dwSize = sizeof(dtOpts);
-	dtOpts.crText = clText;
+	COLORREF clDisabled = 0;
+	if (bDisabled)
+	{
+		clDisabled = clText;
+		for (int x = 0; x < sizeof(COLORREF); x++)
+		{
+			unsigned char* pChar = ((unsigned char*)&clDisabled);
+			unsigned char c = pChar[x];
+			pChar[x] -= c / 4;
+			((unsigned char*)&clDisabled)[x] = pChar[x];
+		}
+			
+	}
+	dtOpts.crText = bDisabled ? clDisabled : clText;
 	dtOpts.dwFlags |= DTT_TEXTCOLOR;
 	DrawThemeTextEx(hTheme, lpDI->hDC, bp, rbState, szText.c_str(), szText.length(), dwDTFlags, &rcText, &dtOpts);
+
 }

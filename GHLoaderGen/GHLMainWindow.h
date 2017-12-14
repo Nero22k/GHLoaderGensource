@@ -2,6 +2,7 @@
 #include "XGui\XMainWindow.h"
 #include "GHLProcPicker.h"
 #include "resource.h"
+#include "LoaderGen.h"
 
 //form properties
 #define SZWND_TITLE _T("GH-Loader Generator")
@@ -40,14 +41,13 @@
 #define IDRDO_LDRLOAD		0x8002
 #define IDRDO_MANMAP		0x8003
 #define IDCHK_THIJACK		0x8004
-#define IDLBL_DELAY			0x8005
-#define IDEDT_DELAY			0x8006
-
-#define IDGRP_INJPOST		0x9000
-#define IDRDO_KEEPPEH		0x9001
-#define IDRDO_ERASEPEH		0x9002
-#define IDRDO_FAKEPEH		0x9003
-#define IDCHK_ULNKPEB		0x9004
+#define IDCHK_HIDEDBG		0x8005
+#define IDLBL_DELAY			0x8006
+#define IDEDT_DELAY			0x8007
+#define IDCBX_PEH			0x8008
+#define IDCHK_SHIFT			0x8009
+#define IDCHK_CDDIR			0x8010
+#define IDCHK_ULNKPEB		0x8011
 
 enum EBTN_COMMANDS : uintptr_t
 {
@@ -70,10 +70,14 @@ public:
 	void SelectReadme();
 	void LaunchGH();
 	void GenerateLoader();
+
 private:
 	int CreateControls();
+	void GetLoaderInfo(LoaderInfo & li);
+private:
 	CGHLProcPicker * pProcPicker = nullptr;
-	CProcess *targetProc;
+	CProcess *targetProc = nullptr;
+	CLoaderGen * pGen;
 };
 
 void ProcPickerCallback();

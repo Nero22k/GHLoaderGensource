@@ -103,8 +103,10 @@ bool CXListView::AddItem(int iItem, int iSubItem)
 	lvi.stateMask = 0;
 	lvi.iSubItem = iSubItem;
 	lvi.iItem = iItem;
+	if (iSubItem == 0)
+		lvi.iImage = iItem;
 
-	if(!ListView_InsertItem(hWnd, &lvi))
+	if (!ListView_InsertItem(hWnd, &lvi))
 		return false;
 	return true;
 }
@@ -119,18 +121,32 @@ bool CXListView::AddItem(CXListViewItem & xListViewItem)
 
 
 	mListItems[xListViewItem.GetItemIndex()] = xListViewItem;
-	if (xListViewItem.GetIconHandle())
-	{
+	//if (xListViewItem.GetIconHandle())
+	//{
 		if (!hSmall)
 		{
 			hSmall = ImageList_Create(GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CXSMICON), ILC_MASK, 1, 1);
-			ImageList_AddIcon(hSmall, xListViewItem.GetIconHandle());
-			ListView_SetImageList(hWnd, hSmall, LVSIL_SMALL);
+			HICON tmp = xListViewItem.GetIconHandle();
+			ImageList_AddIcon(hSmall, tmp ? tmp : LoadIcon(NULL, MAKEINTRESOURCE(IDI_APPLICATION)));
 		}
 		else
-			ImageList_AddIcon(hSmall, xListViewItem.GetIconHandle());
-	}
+		{
+			HICON tmp = xListViewItem.GetIconHandle();
+			ImageList_AddIcon(hSmall, tmp ? tmp : LoadIcon(NULL, MAKEINTRESOURCE(IDI_APPLICATION)));
+			//ListView_SetImageList(hWnd, hSmall, LVSIL_SMALL);
+		}
+//	}
 	return true;
+}
+
+int CXListView::GetSelectedIndex()
+{
+	return ListView_GetSelectionMark(hWnd);
+}
+
+void CXListView::SetIconList()
+{
+	ListView_SetImageList(hWnd, hSmall, LVSIL_SMALL);
 }
 
 CXListViewItem::CXListViewItem(int iItem, int iSubItem, tstring szText)
@@ -148,7 +164,13 @@ CXListViewItem::CXListViewItem(int iItem, int iSubItem, tstring szText, HICON hI
 	this->hIcon = hIcon;
 }
 
-LVITEM & CXListViewItem::GetItem()
+CXListViewItem::~CXListViewItem()
+{
+	if (this->hIcon)
+		DestroyIcon(hIcon);
+}
+
+LVITEM CXListViewItem::GetItem()
 {
 	lvi.pszText = &szText[0];
 	//lvi.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_STATE;
@@ -157,6 +179,7 @@ LVITEM & CXListViewItem::GetItem()
 	lvi.stateMask = 0;
 	lvi.iSubItem = iSubItem;
 	lvi.iItem = iItem;
+	lvi.iImage = iItem;
 	return lvi;
 }
 

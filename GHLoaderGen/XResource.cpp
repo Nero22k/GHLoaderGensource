@@ -49,7 +49,7 @@ size_t CResourceWriter::Write(tstring szFilename, DWORD dwID, DWORD dwType)
 	if (pResource)
 	{
 		hFile = CreateFile(szFilename.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-		if (hFile)
+		if (hFile != INVALID_HANDLE_VALUE)
 		{
 			DWORD outSize = 0;
 			WriteFile(hFile, pResource, size, &outSize, nullptr);

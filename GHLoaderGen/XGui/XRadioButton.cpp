@@ -55,15 +55,18 @@ int CXRadioButton::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	if (HIWORD(wParam) == BN_CLICKED)
 	{
-		if(!bChecked)
-			ToggleCheck();
-		for each(auto c in pGroup->mControls)
+		if (!bChecked)
 		{
-			if (c.second->GetControlType() == RADIO && c.second != this)
+			ToggleCheck();
+			for each(auto c in pGroup->mControls)
 			{
-				reinterpret_cast<CXRadioButton*>(c.second)->SetCheck(false);
+				if (c.second->GetControlType() == RADIO && c.second != this)
+				{
+					reinterpret_cast<CXRadioButton*>(c.second)->SetCheck(false);
+				}
 			}
 		}
+		SetFocus(hWnd);
 	}
 	return 0;
 }

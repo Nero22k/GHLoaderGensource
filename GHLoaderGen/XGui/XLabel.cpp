@@ -45,11 +45,14 @@ bool CXLabel::Create()
 LRESULT CXLabel::OnDrawItem(WPARAM wParam, LPARAM lParam)
 {
 	DRAWITEMSTRUCT* pDi = (DRAWITEMSTRUCT*)lParam;
+	RECT rc = { 0, 0, uWidth, uHeight };
+	COLORREF bgr = GetBackgroundColor();
+	HBRUSH hb = CreateSolidBrush(bgr);
+	FillRect(pDi->hDC, &GetRect(), hb);
 	SetTextColor(pDi->hDC, clText);
 	SetBkMode(pDi->hDC, TRANSPARENT);
 	if (pFont)
 		pFont->SetFont(pDi->hDC);
-
 	DrawText(pDi->hDC, szText.c_str(), szText.length(), &rcRect, dwFlags);
 	return 0;
 }

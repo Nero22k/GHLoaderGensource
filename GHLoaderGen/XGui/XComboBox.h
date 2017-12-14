@@ -12,5 +12,6 @@ public:
 	~CXComboBox();
 	virtual bool Create();
 	virtual void AddString(tstring szText);
+	virtual int GetSelectedIndex();
 };
 

@@ -14,7 +14,7 @@
 #include "XLabel.h"
 #include "XDialog.h"
 #include "XBitmap.h"
-
+#include "..\XIcon.h"
 class CXControlGroup;
 
 class CXControls
@@ -36,7 +36,7 @@ public:
 	T* AddControl(XID id, int x, int y, int w, int h, tstring szText, CXFont * pFont = nullptr);
 
 	template <class T>
-	int AddControlToGroup(XID xGroupID, XID id, int x, int y, int w, int h, tstring szText, CXFont * pFont = nullptr);
+	size_t AddControlToGroup(XID xGroupID, XID id, int x, int y, int w, int h, tstring szText, CXFont * pFont = nullptr);
 
 	void AddGroup(XID xGroupID);
 	void AddGroup(CXControl* pControl);
@@ -82,9 +82,9 @@ inline T* CXControls::AddControl(XID id, int x, int y, int w, int h, tstring szT
 }
 
 template<class T>
-inline int CXControls::AddControlToGroup(XID xGroupID, XID id, int x, int y, int w, int h, tstring szText, CXFont * pFont)
+inline size_t CXControls::AddControlToGroup(XID xGroupID, XID id, int x, int y, int w, int h, tstring szText, CXFont * pFont)
 {
-	int iRet;
+	size_t iRet;
 	//in case you're grouping radio buttons on the main window and not in a groupbox control.
 	
 	if (bIsGroup)

@@ -42,6 +42,16 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				g_pControls->mControls[id]->OnCommand(wParam, lParam);
 			return 0;
 		}
+		case WM_SYSCHAR:
+		case WM_SYSKEYDOWN:
+		case WM_CHAR:
+		case WM_KEYDOWN:
+		{
+			int id = LOWORD(wParam);
+			if (g_pControls->mControls[id])
+				g_pControls->mControls[id]->OnKey(wParam, lParam);
+			return 0;
+		}
 		case WM_DRAWITEM:
 		{
 			if (g_pControls)
@@ -96,10 +106,12 @@ LRESULT CALLBACK MainWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		case WM_DESTROY:
 		{
+			if (g_pMainWindow->GetHandle() != hWnd)
+				break;
 			DestroyWindow(g_pMainWindow->GetHandle());
 		}
 		case WM_CLOSE:
-		{
+		{			
 			PostQuitMessage(0);
 		}
 	}

@@ -5,6 +5,7 @@ CXFileDialog::CXFileDialog(CXWindow * pOwner, EXFILEDIALOGMODE dialogMode, CXFil
 	this->pOwner = pOwner;
 	this->fdMode = dialogMode;
 	this->szFilter.resize(pFilter->GetData().size());
+	this->szExt = pFilter->GetExt();
 	memcpy(&this->szFilter[0], &szFilter[0], szFilter.size());
 	szFileName.resize(MAX_PATH);
 	ofn = { 0 };
@@ -14,8 +15,9 @@ CXFileDialog::CXFileDialog(CXWindow * pOwner, EXFILEDIALOGMODE dialogMode, CXFil
 	ofn.lpstrFile = &szFileName[0];
 	ofn.nMaxFile = MAX_PATH;	
 	ofn.Flags = (fdMode) ? XFDSAVEFLAG : XFDOPENFLAG;
-	ofn.lpstrDefExt = NULL;
+	ofn.lpstrDefExt = pFilter->GetExt().substr(1, pFilter->GetExt().length() - 1).c_str();
 	ofn.hwndOwner = pOwner->GetHandle();//pOwner->GetHandle();
+	
 }
 
 CXFileDialog::~CXFileDialog()
@@ -37,6 +39,9 @@ bool CXFileDialog::Show(tstring & szPath)
 			break;
 	}
 	szPath = ofn.lpstrFile;
+	/*if(fdMode == SAVE)
+		szPath.append((TCHAR*)&szExt[1]);*/
+	
 	return true;
 }
 
@@ -60,6 +65,16 @@ void CXFileDialogFilterEntry::AddEntry(tstring szDesc, tstring szExt)
 	this->szDesc = szDesc;
 	this->szExt = szExt;
 	BuildVector();
+}
+
+tstring CXFileDialogFilterEntry::GetDesc()
+{
+	return szDesc;
+}
+
+tstring CXFileDialogFilterEntry::GetExt()
+{
+	return szExt;
 }
 
 void CXFileDialogFilterEntry::BuildVector()

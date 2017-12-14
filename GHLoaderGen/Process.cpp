@@ -29,6 +29,9 @@ CProcess::~CProcess()
 	{
 		CloseHandle(hHandle);
 	}
+
+	if (hIcon)
+		DestroyIcon(hIcon);
 }
 
 HANDLE CProcess::Open()
@@ -64,7 +67,14 @@ DWORD CProcess::GetPID()
 
 HICON CProcess::GetIcon()
 {	
+	FindIcon();
 	return hIcon;
+}
+
+HICON CProcess::GetIconSm()
+{
+	FindIcon();
+	return hIconSm;
 }
 
 typedef BOOL(WINAPI * _IsWow64Process)(HANDLE, PBOOL);
@@ -118,14 +128,50 @@ void CProcess::FindIcon()
 {
 	HRSRC hRes;
 	GetProcPath();
-	if (!hIcon && !szPath.empty())
+	if (!hIcon && !this->szPath.empty())
 	{
-		if (!hHandle)
-			Open();
-		if (!hHandle)
-			return;
+		//if (!hHandle)
+		//	Open();
+		//if (!hHandle)
+		//	return;
+
+		//int iconSize = GetSystemMetrics(SM_CXSMICON);
+		//HICON* pIcons = (HICON*)LocalAlloc(LPTR, 500 * sizeof(HICON));
+		//int iIcons = ExtractIcons::Get(szPath.c_str(), 0, iconSize, iconSize, pIcons, NULL, 500, LR_COLOR);
+		//hIcon = CopyIcon(pIcons[0]);
+		//LocalFree(HLOCAL(pIcons));
+		//ICONINFO oInfo;
+		//HICON hSmall, hLarge[2];
+		
+		ExtractIconEx(szPath.c_str(), 0, &hIcon, &hIconSm, 1);
+		////GetIconInfo(hSmall, &oInfo);
+		////hIcon = CreateIconIndirect(&oInfo);
+		//hIcon = CopyIcon(hLarge[0]);
+		//hIconSm = CopyIcon(hSmall[0]);
+		//if (hSmall[1])
+		//	DestroyIcon(hSmall[1]);
+		//DestroyIcon(hSmall[0]);
+		//if (hLarge[1])
+		//	DestroyIcon(hLarge[1]);
+		//DestroyIcon(hLarge[0]);
+
+	/*	HMODULE hMod = LoadLibrary(szPath.c_str());
+		ExtractAssociatedIcon(GetModuleHandle(0), szPath)*/
 
 
-		hIcon = NULL;
+		//SHFILEINFO sfi;
+		////CoInitializeEx(NULL, COINIT::COINIT_APARTMENTTHREADED);
+		//CoInitialize(NULL);
+		//if (SHGetFileInfo(szPath.c_str(), 0, &sfi, sizeof(sfi), SHGFI_ICON | SHGFI_SMALLICON))
+		//{
+		//	//hIcon = sfi.hIcon;
+		//	hIcon = CopyIcon(sfi.hIcon);
+		//	hIconSm = hIcon;
+		//	GetIconInfo(sfi.hIcon, &oInfo);
+		//	hIcon = CreateIconIndirect(&oInfo);
+		//	DestroyIcon(sfi.hIcon);
+		//	hIconSm = hIcon;
+		//	//hIcon = ExtractIcon(GetModuleHandle(0), &szPath[0], 1);
+		//}
 	}
 }

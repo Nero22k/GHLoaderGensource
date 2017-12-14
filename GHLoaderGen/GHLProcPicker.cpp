@@ -41,19 +41,22 @@ void CGHLProcPicker::FillList()
 	tstring pid(22, 0);
 	ProcVec pv = procManager.GetProcs();
 	//HICON hApp = LoadIcon(NULL, IDI_APPLICATION);
+	auto xLV = xControls->GetControl<CXListView>(IDLIST1);
 	for (auto p : pv)
 	{
-		HICON i = p->GetIcon();
-		CXListViewItem listItem = CXListViewItem(x, 0, L"", (i) ? i : hIcon);
-		listItem.AddSubItem(x, 1, (p->Is64Bit()) ? L"x64" : L"x86");		
-		listItem.AddSubItem(x, 2, p->GetProcName());
+		//HICON i = ExtractIcon(hInstance, p->GetProcPath().c_str(), 0);
+		//i = p->GetIcon();
+		//vIconsSmall.push_back(p->GetIcon());
+		CXListViewItem * listItem = new CXListViewItem(x, 0, L"", p->GetIconSm());
+		listItem->AddSubItem(x, 1, (p->Is64Bit()) ? L"x64" : L"x86");		
+		listItem->AddSubItem(x, 2, p->GetProcName());
 		_itow_s(p->GetPID(), &pid[0], 22, 10);
-		listItem.AddSubItem(x, 3, pid);
-		listItem.AddSubItem(x, 4, p->GetProcPath());
-		auto xLV = xControls->GetControl<CXListView>(IDLIST1);
-		xLV->AddItem(listItem);
+		listItem->AddSubItem(x, 3, pid);
+		listItem->AddSubItem(x, 4, p->GetProcPath());
+		xLV->AddItem(*listItem);
 		x++;
 	}
+	xLV->SetIconList();
 	//DestroyIcon(hApp);
 }
 
@@ -83,9 +86,10 @@ void CGHLProcPicker::Init()
 
 void CGHLProcPicker::SelectProcess()
 {
-	CXListView* pLV = xControls->GetControl<CXListView>(IDLIST1);
-	int selectmark = ListView_GetSelectionMark(pLV->GetHandle()); //sigh...
-	*procTarget = procManager.GetProcs().at(selectmark);
+	int iSelected = xControls->GetControl<CXListView>(IDLIST1)->GetSelectedIndex();
+	if (iSelected < 0)
+		return;
+	*procTarget = procManager.GetProcs().at(iSelected);
 	ppc();
 	this->Destroy();
 }

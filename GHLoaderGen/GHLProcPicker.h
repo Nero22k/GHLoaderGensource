@@ -22,5 +22,6 @@ private:
 	ProcManager procManager;
 	CProcess ** procTarget;
 	std::function<void()> ppc;
+	std::vector<HICON> vIconsSmall;
 };
 

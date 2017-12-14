@@ -21,7 +21,7 @@ protected:
 	CXControls* xControls;
 	XDialogID xDialogID;
 	bool bShown = false;
-	bool bCloseOnEsc = true;
+	bool bCloseOnEsc = false;
 };
 
 

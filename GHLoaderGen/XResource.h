@@ -1,6 +1,6 @@
 #pragma once
 #include <stdafx.h>
-
+#include "ResourceManager.h"
 typedef std::vector<byte> ResourceDataVec;
 
 class CXResource

@@ -16,6 +16,8 @@ public:
 	CXFileDialogFilterEntry(tstring szDesc, tstring szExt);
 	std::vector<TCHAR>& GetData();
 	void AddEntry(tstring szDesc, tstring szExt);
+	tstring GetDesc();
+	tstring GetExt();
 private:
 	void BuildVector();
 private:
@@ -40,5 +42,6 @@ private:
 	tstring szFilter; 
 	tstring szDefExt;
 	tstring szFileName;
+	tstring szExt;
 };
 

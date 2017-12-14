@@ -108,6 +108,11 @@ void CXControl::OnPaint(WPARAM wParam, LPARAM lParam)
 {
 }
 
+int CXControl::OnKey(WPARAM wParam, LPARAM lParam)
+{
+	return 0;
+}
+
 void CXControl::OnNotify(UINT code, LPARAM lParam)
 {
 }

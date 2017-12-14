@@ -148,13 +148,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Binary.h" />
+    <ClInclude Include="ExtractIcon.h" />
     <ClInclude Include="GHLGen.h" />
     <ClInclude Include="GHLMainWindow.h" />
     <ClInclude Include="GHLProcPicker.h" />
     <ClInclude Include="Include\stdafx.h" />
+    <ClInclude Include="LoaderGen.h" />
     <ClInclude Include="Process.h" />
     <ClInclude Include="ProcManager.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="ResourceManager.h" />
+    <ClInclude Include="Utility.h" />
     <ClInclude Include="XGui\XBitmap.h" />
     <ClInclude Include="XGui\XButton.h" />
     <ClInclude Include="XGui\XCheckBox.h" />
@@ -177,14 +182,20 @@
     <ClInclude Include="XGui\XTabControl.h" />
     <ClInclude Include="XGui\XTrackBar.h" />
     <ClInclude Include="XGui\XWindow.h" />
+    <ClInclude Include="XIcon.h" />
     <ClInclude Include="XResource.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Binary.cpp" />
+    <ClCompile Include="ExtractIcon.cpp" />
     <ClCompile Include="GHLGen.cpp" />
     <ClCompile Include="GHLMainWindow.cpp" />
     <ClCompile Include="GHLProcPicker.cpp" />
+    <ClCompile Include="LoaderGen.cpp" />
     <ClCompile Include="Process.cpp" />
     <ClCompile Include="ProcManager.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="Utility.cpp" />
     <ClCompile Include="WinMain.cpp" />
     <ClCompile Include="XGui\XBitmap.cpp" />
     <ClCompile Include="XGui\XButton.cpp" />
@@ -208,6 +219,7 @@
     <ClCompile Include="XGui\XTabControl.cpp" />
     <ClCompile Include="XGui\XTrackBar.cpp" />
     <ClCompile Include="XGui\XWindow.cpp" />
+    <ClCompile Include="XIcon.cpp" />
     <ClCompile Include="XResource.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -215,6 +227,14 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="GH Injector - x64.exe" />
+    <None Include="GH Injector - x86.exe" />
+    <None Include="GHLoader_v2x64.exe" />
+    <None Include="GHLoader_v2x86.exe">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

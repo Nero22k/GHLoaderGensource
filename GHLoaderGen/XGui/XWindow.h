@@ -41,6 +41,7 @@ public:
 	virtual RECT & GetWndRect();
 	virtual HANDLE GetBackground();
 	virtual tstring GetText();
+	
 
 	virtual void SetOwnerWindow(CXWindow* pWindow);
 	virtual void SetBgColor(COLORREF clColor);
@@ -54,6 +55,8 @@ public:
 	virtual void SetHeight(UINT uHeight);
 	virtual void SetBrush(HBRUSH hBrush);
 	virtual void SetWndProc(WNDPROC WndProc);
+
+	virtual void Clear();
 
 protected:
 	CXWindow*	pOwnerWindow;

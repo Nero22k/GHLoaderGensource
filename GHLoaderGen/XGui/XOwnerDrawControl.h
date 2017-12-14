@@ -23,6 +23,7 @@ public:
 	virtual bool GetCheck();
 	virtual void ToggleCheck();
 	virtual void SetHot(bool isHot);
+	virtual void Disable(bool bDisable);
 private:
 	void DetermineTypeAndState(int & iButtonPart, DWORD & dwState);
 
@@ -30,6 +31,7 @@ protected:
 	DWORD dwDTFlags = DT_LEFT | DT_SINGLELINE;
 	bool bChecked = false;
 	bool bHot = false;
+	bool bDisabled = false;
 };
 
 extern std::map<XID, CXOwnerDrawControl*> mODControls;

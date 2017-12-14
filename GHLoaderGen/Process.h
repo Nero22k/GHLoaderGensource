@@ -1,6 +1,6 @@
 #pragma once
-#include "stdafx.h"
-
+//#include "stdafx.h"
+#include "ExtractIcon.h"
 class CProcess
 {
 	struct CProcessTimes
@@ -22,6 +22,7 @@ public:
 	tstring GetProcPath();
 	DWORD GetPID();
 	HICON GetIcon();
+	HICON GetIconSm();
 	bool Is64Bit();
 	
 private:
@@ -38,5 +39,7 @@ private:
 	bool is32bit;
 	CProcessTimes cpTimes{ 0 };
 	HICON hIcon = NULL;
+	HICON hIconSm = NULL;
+
 };
 
