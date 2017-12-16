@@ -65,8 +65,8 @@ void CGHLProcPicker::Init()
 	Create();
 	GetRect();
 	xControls = new CXControls(this);
-
-	xControls->AddControl<CXListView>(IDLIST1, 15, 15, 550, rcRect.bottom/* - 35*/, _T(" "));
+	
+	xControls->AddControl<CXListView>(IDLIST1, 15, 15, 550, 250, _T(" "));
 	CXListView* list = xControls->GetControl<CXListView>(IDLIST1);
 	list->SetColumnWidth(0, 32);
 	list->InsertColumn(_T("Arch"), 48, LVCFMT_CENTER);
@@ -77,10 +77,12 @@ void CGHLProcPicker::Init()
 	//xControls->AddControl<CXButton>(IDLBL_REFRESH, 15, 240, 120, 25, L"Refresh");
 
 	RECT rc = list->GetRect();
-	CXButton * pBtn = xControls->AddControl<CXButton>(IDBUTTON1, 15, 275, rc.right - rc.left, 25, _T("Select Process"));
+
+	CXButton * pBtn = xControls->AddControl<CXButton>(IDBUTTON1, 15, rc.bottom + 10, 550, 25, _T("Select Process"));
 	std::function<void(uintptr_t)> bc = BtnCallback_SelectProcess;
 	pBtn->SetAction(bc);
 	pBtn->SetCommandArgs((uintptr_t)this);
+
 	procManager.LoadProcs();
 }
 
