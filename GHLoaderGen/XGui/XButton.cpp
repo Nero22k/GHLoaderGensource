@@ -21,11 +21,6 @@ bool CXButton::Create()
 	return true;
 }
 
-void CXButton::SetCommandArgs(uintptr_t pArgs)
-{
-	this->pCommandArgs = pArgs;
-}
-
 int CXButton::OnCommand(WPARAM wParam, LPARAM lParam, uintptr_t pArg1)
 {	
 	if (fnAction)

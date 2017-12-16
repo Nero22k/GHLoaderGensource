@@ -55,7 +55,7 @@ void InitResBuffer(std::vector<byte>& vResource, LoaderInfo * loaderInfo)
 
 	// ---------------- injector settings ----------------
 	WriteToResBuffer<uint>(vResource, loaderInfo->injSettings.iInjMethod, sizeof(uint));
-	WriteToResBuffer<BOOL>(vResource, loaderInfo->injSettings.bThreadHiJack, sizeof(BOOL));
+	WriteToResBuffer<BOOL>(vResource, loaderInfo->injSettings.iLaunchMethod, sizeof(uint));
 	WriteToResBuffer<BOOL>(vResource, loaderInfo->injSettings.bHideDebug, sizeof(BOOL));
 	WriteToResBuffer<uint>(vResource, loaderInfo->injSettings.iPEHMethod, sizeof(uint));
 	WriteToResBuffer<BOOL>(vResource, loaderInfo->injSettings.bShiftMod, sizeof(BOOL));
@@ -70,7 +70,7 @@ int CLoaderGen::Generate(tstring &szFilepath, LoaderInfo * loaderInfo, bool b64)
 	this->szFilepath = szFilepath;
 	//we have the info, we have where we're writing our loader
 	//first thing is write loader to disk
-	WriteLoaderBin(b64);
+	WriteLoaderBin(b64, loaderInfo->loadSettings.bUPX);
 
 	//load loader config data
 	std::vector<byte> vResource; //resource data
@@ -97,8 +97,17 @@ int CLoaderGen::Generate(tstring &szFilepath, LoaderInfo * loaderInfo, bool b64)
 	rm.AddResource(&resInj);
 
 	//write readme to loader if there is one
-	//CResource resReadme(IDLOADERREADME, TEXTFILE, LoadReadme()); //IMPLEMENT ME!!! :(
-	//rm.AddResource(&resReadme);
+	std::vector<byte> vReadme;
+	if (!this->szReadme.empty())
+	{
+		vReadme = LoadReadme();
+		if (!vReadme.empty())
+		{
+			CResource resReadme(IDR_TEXTFILE1, TEXTFILE, vReadme); //IMPLEMENT ME!!! :(
+			rm.AddResource(&resReadme);
+		}
+	}
+	
 	rm.UpdateResources();
 
 	MessageBox(NULL, L"AND we're done.", L"COMPLEET SUCKSHESS!", MB_ICONASTERISK | MB_OK);
@@ -121,7 +130,7 @@ int CLoaderGen::GetLoaderInfoSize(LoaderInfo * li)
 	return size;
 }
 
-void CLoaderGen::WriteLoaderBin(bool b64)
+void CLoaderGen::WriteLoaderBin(bool b64, BOOL bUPX)
 {
 	CResourceWriter rw(GetModuleHandle(0));
 	if (!b64)
@@ -131,6 +140,13 @@ void CLoaderGen::WriteLoaderBin(bool b64)
 	else
 	{
 		rw.Write(szFilepath, IDLOADER64, BINARY);
+	}
+	if (bUPX)
+	{
+		size_t pos = szFilepath.find_last_of(_T('\\'));
+		tstring buf = szFilepath.substr(0, pos);
+		buf.append(_T("\\upx.exe"));
+		//rw.Write(buf, IDUPX, BINARY);
 	}
 }
 
@@ -175,4 +191,33 @@ std::vector<byte> CLoaderGen::LoadInjector(bool b64)
 	vInj = rr.ReadIntoVector(b64 ? IDINJ64 : IDINJ32, BINARY);
 	CResource resInj(IDLOADERINJ, BINARY, vInj);
 	return vInj;
+}
+
+std::vector<byte> CLoaderGen::LoadReadme()
+{
+	HANDLE hFile = CreateFile(szReadme.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (!hFile)
+	{
+		CloseHandle(hFile);
+		return std::vector<byte>(0);
+	}
+
+	DWORD dwSize = GetFileSize(hFile, nullptr);
+	if (!dwSize)
+	{
+		CloseHandle(hFile);
+		return std::vector<byte>(0);
+	}
+
+	std::vector<byte> vBuffer(dwSize);
+	if (!ReadFile(hFile, &vBuffer[0], dwSize, NULL, NULL))
+	{
+		CloseHandle(hFile);
+		return std::vector<byte>(0);
+	}
+
+	CloseHandle(hFile);
+	if (vBuffer.back() != 0)
+		vBuffer.push_back(0);
+	return vBuffer;
 }

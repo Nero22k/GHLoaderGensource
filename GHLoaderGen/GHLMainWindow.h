@@ -40,7 +40,7 @@
 #define IDRDO_LOADLIB		0x8001
 #define IDRDO_LDRLOAD		0x8002
 #define IDRDO_MANMAP		0x8003
-#define IDCHK_THIJACK		0x8004
+#define IDCBX_LAUNCH		0x8004
 #define IDCHK_HIDEDBG		0x8005
 #define IDLBL_DELAY			0x8006
 #define IDEDT_DELAY			0x8007
@@ -70,7 +70,8 @@ public:
 	void SelectReadme();
 	void LaunchGH();
 	void GenerateLoader();
-
+	void InjMethodRestrictions(uintptr_t iMethod);
+	void LaunchMethodRestrictions(uintptr_t iMethod);
 private:
 	int CreateControls();
 	void GetLoaderInfo(LoaderInfo & li);

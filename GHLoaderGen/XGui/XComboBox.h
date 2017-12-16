@@ -13,5 +13,11 @@ public:
 	virtual bool Create();
 	virtual void AddString(tstring szText);
 	virtual int GetSelectedIndex();
+	virtual int OnCommand(WPARAM wParam, LPARAM lParam);
+	void SetSelectionChangeCB(std::function<void(uintptr_t)> fnSelectionChangeCallback, uintptr_t pArg);
+
+private:
+	std::function<void(uintptr_t)> fnSelectionChangeCallback;
+	uintptr_t pSelectionChangeArg;
 };
 

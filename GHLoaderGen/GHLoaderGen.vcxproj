@@ -159,6 +159,7 @@
     <ClInclude Include="ProcManager.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="ResourceManager.h" />
+    <ClInclude Include="UPX.h" />
     <ClInclude Include="Utility.h" />
     <ClInclude Include="XGui\XBitmap.h" />
     <ClInclude Include="XGui\XButton.h" />
@@ -195,6 +196,7 @@
     <ClCompile Include="Process.cpp" />
     <ClCompile Include="ProcManager.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="UPX.cpp" />
     <ClCompile Include="Utility.cpp" />
     <ClCompile Include="WinMain.cpp" />
     <ClCompile Include="XGui\XBitmap.cpp" />
@@ -235,6 +237,7 @@
     <None Include="GHLoader_v2x86.exe">
       <FileType>Document</FileType>
     </None>
+    <None Include="upx.exe" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

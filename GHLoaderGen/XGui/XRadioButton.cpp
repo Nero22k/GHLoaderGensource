@@ -66,6 +66,8 @@ int CXRadioButton::OnCommand(WPARAM wParam, LPARAM lParam)
 				}
 			}
 		}
+		if (fnAction)
+			fnAction(pCommandArgs);
 		SetFocus(hWnd);
 	}
 	return 0;

@@ -32,6 +32,7 @@ public:
 	virtual void SetFont(CXFont * pFont);
 	virtual void SetTxtColor(COLORREF clText);
 	virtual void SetAction(std::function<void(uintptr_t)> fnAction);
+	virtual void SetCommandArgs(uintptr_t pArgs);
 	virtual int OnCommand(WPARAM wParam, LPARAM, uintptr_t pArgs);
 	virtual int OnCommand(WPARAM wParam, LPARAM);
 	virtual void OnNotify(UINT code, LPARAM lParam);
@@ -46,6 +47,7 @@ protected:
 	ECXControl ControlType;
 	CXFont * pFont = nullptr;
 	std::function<void(uintptr_t)> fnAction;
+	uintptr_t pCommandArgs = 0;
 	COLORREF clText = RGB(255,0,0);
 };
 

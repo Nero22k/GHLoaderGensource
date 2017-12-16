@@ -25,6 +25,16 @@ void BtnCallback(uintptr_t iCommand)
 	}
 }
 
+void InjMethodCallback(uintptr_t iMethod)
+{
+	g_pMain->InjMethodRestrictions(iMethod);
+}
+
+void LaunchMethodCallback(uintptr_t iMethod)
+{
+	g_pMain->LaunchMethodRestrictions(iMethod);
+}
+
 GHLMainWindow::GHLMainWindow(HINSTANCE hInstance, int x, int y)
 	: CXMainWindow(hInstance, SZWND_TITLE, XMAINWNDCLS, x, y, GHL_WND_W, GHL_WND_H)
 {
@@ -151,6 +161,50 @@ void GHLMainWindow::GenerateLoader()
 	pGen->Generate(filepath, &li, dll.Is64BitImage());
 }
 
+void GHLMainWindow::InjMethodRestrictions(uintptr_t iMethod)
+{
+	auto pInjGrp = pControls->GetControl<CXGroupBox>(IDGRP_INJSET)->pControls;
+	auto pChkUnlinkPEB = pInjGrp->vGroups[IDGRP_INJSET]->GetControl<CXCheckBox>(IDCHK_ULNKPEB);
+	auto pChkShift = pInjGrp->vGroups[IDGRP_INJSET]->GetControl<CXCheckBox>(IDCHK_SHIFT);
+	auto pChkCleanDir = pInjGrp->vGroups[IDGRP_INJSET]->GetControl<CXCheckBox>(IDCHK_CDDIR);
+	if (iMethod != 2)
+	{
+		pChkShift->SetCheck(false);
+		pChkShift->Disable(true);
+		pChkCleanDir->SetCheck(false);
+		pChkCleanDir->Disable(true);
+		pChkUnlinkPEB->Disable(false);
+	}
+	else
+	{	//manual mapping
+		pChkUnlinkPEB->SetCheck(true);
+		pChkUnlinkPEB->Disable(true);
+		pChkShift->Disable(false);
+		pChkCleanDir->Disable(false);
+	}
+	RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
+}
+
+void GHLMainWindow::LaunchMethodRestrictions(uintptr_t iMethod)
+{
+	auto pInjGrp = pControls->GetControl<CXGroupBox>(IDGRP_INJSET)->pControls;
+	auto pChkHide = pInjGrp->vGroups[IDGRP_INJSET]->GetControl<CXCheckBox>(IDCHK_HIDEDBG);
+	switch (iMethod)
+	{
+		case 0:
+		{
+			pChkHide->Disable(false);
+			break;
+		}
+		default:
+		{
+			pChkHide->SetCheck(false);
+			pChkHide->Disable(true);
+		}
+	}
+	RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
+}
+
 int GHLMainWindow::CreateControls()
 {
 	CXControls* pC;
@@ -165,11 +219,11 @@ int GHLMainWindow::CreateControls()
 	pGb->SetControlManager(new CXControls(pGb));
 	pC = pGb->pControls;
 	
-	pC->AddControl<CXLabel>(IDLBL_FORMNAME, 10, 23, 80, 25, L"Window Title:");
+	pC->AddControl<CXLabel>(IDLBL_FORMNAME, 10, 23, 90, 25, L"Window Title:");
 	pC->AddControl<CXEdit>(IDEDT_FORMNAME, 110, 20, 150, 25, L"SupaDupaHax");
-	pC->AddControl<CXLabel>(IDLBL_GAMENAME, 10, 53, 80, 25, L"Game Title:");
+	pC->AddControl<CXLabel>(IDLBL_GAMENAME, 10, 53, 90, 25, L"Game Title:");
 	pC->AddControl<CXEdit>(IDEDT_GAMENAME, 110, 50, 150, 25, L"AssaultCube");
-	pC->AddControl<CXLabel>(IDLBL_AUTHOR, 10, 83, 80, 25, L"Author:");
+	pC->AddControl<CXLabel>(IDLBL_AUTHOR, 10, 83, 90, 25, L"Author:");
 	pC->AddControl<CXEdit>(IDEDT_AUTHOR, 110, 80, 150, 25, L"Traxin");
 
 	pControls->AddControl<CXEdit>(IDEDT_DLLPATH, 290, 45, 275, 25, L"C:\\hax.dll");
@@ -191,13 +245,13 @@ int GHLMainWindow::CreateControls()
 	pGb->SetControlManager(new CXControls(pGb));
 
 	pC = pGb->pControls;
-	pCtrl = pC->AddControl<CXLabel>(IDLBL_PROCNAME, 10, 23, 40, 25, L"Name:");
+	pCtrl = pC->AddControl<CXLabel>(IDLBL_PROCNAME, 10, 23, 50, 25, L"Name:");
 
 	//pC->AddGroup(IDGRP_PROCESS);
 	//pC->AddControlToGroup<CXLabel>(IDGRP_PROCESS, IDLBL_PROCNAME, 10, 23, 40, 25, L"Name:");
 	pC->AddControl<CXEdit>(IDEDT_PROCNAME, 65, 20, 120, 25, L"ac_client.exe");
-	pCtrl = pC->AddControl<CXLabel>(IDLBL_PID, 10, 55, 60, 25, L"PID: ");
-	pCtrl = pC->AddControl<CXLabel>(IDLBL_ARCH, 10, 85, 60, 25, L"Arch: ");
+	pCtrl = pC->AddControl<CXLabel>(IDLBL_PID, 10, 55, 100, 25, L"PID: ");
+	pCtrl = pC->AddControl<CXLabel>(IDLBL_ARCH, 10, 85, 100, 25, L"Arch: ");
 	auto pIco = pC->AddControl<CXIcon>(0x1111, 120, 60, 32, 32, L" ");
 	pIco->Load(LoadIcon(NULL, MAKEINTRESOURCE(IDI_ERROR)));
 
@@ -213,26 +267,51 @@ int GHLMainWindow::CreateControls()
 	pGb->SetTxtColor(RGB(200, 200, 200));
 	pGb->SetControlManager(new CXControls(pGb));
 	pC = pGb->pControls;
+
+	std::function<void(uintptr_t)> imc = InjMethodCallback;
 	pC->AddGroup(IDGRP_INJSET);
 	pC->AddControlToGroup<CXRadioButton>(IDGRP_INJSET, IDRDO_LOADLIB, 10, 20, 125, 25, L"LoadLibrary");
-	pC->vGroups[IDGRP_INJSET]->GetControl<CXRadioButton>(IDRDO_LOADLIB)->SetCheck(true);
-	//pC->GetControl<CXRadioButton>(IDRDO_LOADLIB)->SetCheck(true);
+	auto pCheck = pC->vGroups[IDGRP_INJSET]->GetControl<CXRadioButton>(IDRDO_LOADLIB);
+	pCheck->SetAction(imc);
+	pCheck->SetCommandArgs(0);
+	pCheck->SetCheck(true);
+
 	pC->AddControlToGroup<CXRadioButton>(IDGRP_INJSET, IDRDO_LDRLOAD, 125, 20, 125, 25, L"LdrLoadDll");
+	pCheck = pC->vGroups[IDGRP_INJSET]->GetControl<CXRadioButton>(IDRDO_LDRLOAD);
+	pCheck->SetAction(imc);
+	pCheck->SetCommandArgs(1);
+
 	pC->AddControlToGroup<CXRadioButton>(IDGRP_INJSET, IDRDO_MANMAP, 235, 20, 125, 25, L"Manual Map");
-	pC->AddControlToGroup<CXCheckBox>(IDGRP_INJSET, IDCHK_THIJACK, 10, 50, 150, 25, L"Thread Hijacking");
-	pC->AddControlToGroup<CXCheckBox>(IDGRP_INJSET, IDCHK_HIDEDBG, 160, 50, 175, 25, L"Hide from Debugger");
+	pCheck = pC->vGroups[IDGRP_INJSET]->GetControl<CXRadioButton>(IDRDO_MANMAP);
+	pCheck->SetAction(imc);
+	pCheck->SetCommandArgs(2);
 
-	CXCheckBox * pChckBox = pC->vGroups[IDGRP_INJSET]->GetControl<CXCheckBox>(IDCHK_HIDEDBG);
-	pChckBox->Disable(true);
+	//pC->AddControlToGroup<CXCheckBox>(IDGRP_INJSET, IDCHK_THIJACK, 10, 50, 150, 25, L"NtCreateThreadEx");
+	CXComboBox* pCB = pC->AddControl<CXComboBox>(IDCBX_LAUNCH, 10, 50, 160, 25, L"NtCreateThreadEx");
+	pCB->AddString(L"Thread Hijacking");
+	pCB->AddString(L"SetWindowsHookEx");
+	pCB->AddString(L"QueueUserAPC");
 
-	CXComboBox* pCB = pC->AddControl<CXComboBox>(IDCBX_PEH, 10, 90, 125, 25, L"Keep PEH");
-	pCB->SetStyle(WS_XCOMBOBOXDROPLIST);
+	pCB->SetSelectionChangeCB(LaunchMethodCallback, 0);
+
+	pC->AddControlToGroup<CXCheckBox>(IDGRP_INJSET, IDCHK_HIDEDBG, 170, 50, 175, 25, L"Hide from Debugger");
+
+	pCB = pC->AddControl<CXComboBox>(IDCBX_PEH, 10, 90, 120, 25, L"Keep PEH");
 	pCB->AddString(L"Erase PEH");
 	pCB->AddString(L"Fake PEH");
 
 	pC->AddControlToGroup<CXCheckBox>(IDGRP_INJSET, IDCHK_ULNKPEB, 10, 115, 150, 25, L"Unlink from PEB");
-	pC->AddControlToGroup<CXCheckBox>(IDGRP_INJSET, IDCHK_SHIFT, 160, 95, 175, 25, L"Shift Module");
-	pC->AddControlToGroup<CXCheckBox>(IDGRP_INJSET, IDCHK_CDDIR, 160, 115, 175, 25, L"Clean Data Directories");
+	pCheck = pC->vGroups[IDGRP_INJSET]->GetControl<CXRadioButton>(IDCHK_ULNKPEB);
+	pCheck->SetCheck(true);
+
+	pC->AddControlToGroup<CXCheckBox>(IDGRP_INJSET, IDCHK_SHIFT, 170, 90, 175, 25, L"Shift Module");
+	pCheck = pC->vGroups[IDGRP_INJSET]->GetControl<CXRadioButton>(IDCHK_SHIFT);
+	pCheck->Disable(true);
+
+	pC->AddControlToGroup<CXCheckBox>(IDGRP_INJSET, IDCHK_CDDIR, 170, 115, 175, 25, L"Clean Data Directories");
+	pCheck = pC->vGroups[IDGRP_INJSET]->GetControl<CXRadioButton>(IDCHK_CDDIR);
+	pCheck->Disable(true);
+	
 	pCtrl = pC->AddControl<CXLabel>(IDLBL_DELAY, 50, 148, 100, 25, L"Delay: ");
 	pCtrl->SetTxtColor(RGB(200, 200, 200));
 	pCtrl = pC->AddControl<CXEdit>(IDEDT_DELAY, 120, 145, 200, 25, L"0");
@@ -289,10 +368,11 @@ void GHLMainWindow::GetLoaderInfo(LoaderInfo & li)
 	pGB->pControls->vGroups[IDGRP_INJSET]->GetControl<CXCheckBox>(IDRDO_LOADLIB);
 	// todo: need to get figure out which radio button in the group is selected
 	int pehMethod = pGB->pControls->GetControl<CXComboBox>(IDCBX_PEH)->GetSelectedIndex();
-
+	
+	pC = pGB->pControls;
 	li.injSettings.iPEHMethod = pehMethod;
-	li.injSettings.bThreadHiJack = pC->GetControl<CXCheckBox>(IDCHK_THIJACK)->GetCheck();
-	li.injSettings.bUnlinkPEB = pC->GetControl<CXCheckBox>(IDCHK_ULNKPEB)->GetCheck();
+	li.injSettings.iLaunchMethod = pC->GetControl<CXComboBox>(IDCBX_LAUNCH)->GetSelectedIndex();
+	li.injSettings.bUnlinkPEB = pC->vGroups[IDGRP_INJSET]->GetControl<CXCheckBox>(IDCHK_ULNKPEB)->GetCheck();
 
 
 	tstring buf = pGB->pControls->GetControl<CXEdit>(IDEDT_DELAY)->GetText();

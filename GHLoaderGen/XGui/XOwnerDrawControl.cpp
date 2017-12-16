@@ -85,8 +85,13 @@ int CXOwnerDrawControl::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	if (HIWORD(wParam) == BN_CLICKED)
 	{
-		bChecked = !bChecked;
-		SetFocus(hWnd);
+		if (!bDisabled)
+		{
+			bChecked = !bChecked;
+			SetFocus(hWnd);
+			if (fnAction)
+				fnAction(pCommandArgs);
+		}
 	}
 
 	return 0;
@@ -176,7 +181,7 @@ void CXOwnerDrawControl::DetermineTypeAndState(int & iButtonPart, DWORD & dwStat
 
 		case CHECKBOX:
 			iButtonPart = BP_CHECKBOX;
-			if (bChecked && !bDisabled)
+			if (bChecked)
 			{
 				dwState = CBS_CHECKEDNORMAL;
 			}

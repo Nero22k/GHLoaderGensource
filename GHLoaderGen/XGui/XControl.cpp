@@ -59,6 +59,11 @@ void CXControl::SetAction(std::function<void(uintptr_t)> fnAction)
 	this->fnAction = fnAction;
 }
 
+void CXControl::SetCommandArgs(uintptr_t pArgs)
+{
+	this->pCommandArgs = pArgs;
+}
+
 int CXControl::OnCommand(WPARAM wParam, LPARAM, uintptr_t pArg1)
 {
 	return 0;

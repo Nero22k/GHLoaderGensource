@@ -275,5 +275,8 @@
     <None Include="GH Injector - x86.exe">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="upx.exe">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

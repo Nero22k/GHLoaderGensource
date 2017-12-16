@@ -17,7 +17,7 @@
 
 //#include "resource.h"
 #include "..\Utility.h"
-
+#include <CommCtrl.h>
 #pragma comment(lib, "Comctl32.lib")
 #pragma comment(lib, "UxTheme.lib")
 //applies current windows theme to controls.

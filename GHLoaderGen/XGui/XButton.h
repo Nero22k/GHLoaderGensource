@@ -11,7 +11,7 @@ public:
 	CXButton(CXWindow * pOwner, XID xID, int x, int y, int w, int h, tstring szText, CXFont * pFont = nullptr);
 	~CXButton();
 	virtual bool Create();
-	void SetCommandArgs(uintptr_t pArgs);
+	
 	virtual int OnCommand(WPARAM wParam, LPARAM lParam, uintptr_t pArg1);
 	virtual int OnCommand(WPARAM wParam, LPARAM lParam);
 
@@ -19,6 +19,6 @@ public:
 
 private:
 	HICON hIcon = NULL;
-	uintptr_t pCommandArgs = 0;
+	
 };
 

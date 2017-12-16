@@ -7,7 +7,7 @@ CXLabel::CXLabel(CXWindow * pOwner, XID xID, int x, int y, int w, int h, tstring
 {
 	szClass = _T("STATIC");
 	SetStyle(WS_XLABEL);
-	dwFlags = DT_NOCLIP;
+	dwFlags = DT_LEFT;
 	rcRect.left = x;
 	rcRect.right = x + w;
 	rcRect.top = y;
