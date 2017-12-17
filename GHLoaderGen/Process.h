@@ -24,7 +24,8 @@ public:
 	HICON GetIcon();
 	HICON GetIconSm();
 	bool Is64Bit();
-	
+	bool IsAlive();
+
 private:
 	void Start();
 	void FindProcPath();

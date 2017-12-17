@@ -34,7 +34,7 @@ public:
 	ProcVec& GetProcs();
 	CProcess FindProcess(tstring szProcessName);
 	void TerminateScan();
-
+	bool IsProcessAlive(tstring szProcessName);
 public:
 	ProcVec& Sort(EPM_SortMethod sortMethod);
 private:

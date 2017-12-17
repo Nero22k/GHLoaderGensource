@@ -56,6 +56,5 @@ BOOL CResourceManager::UpdateResources()
 {
 	for each(auto rRes in vResources)
 		rRes->Update(hUpdate);
-
 	return EndUpdateResource(hUpdate, FALSE);
 }

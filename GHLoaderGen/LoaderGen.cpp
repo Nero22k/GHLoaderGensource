@@ -4,6 +4,7 @@
 #define CreateNewFile(s) CreateFile(s, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
 CLoaderGen::CLoaderGen(tstring * szDllPath, tstring * szReadme)
+	: upx(_T("upx.exe"))
 {
 	this->szDllPath = szDllPath->c_str();
 	this->szReadme = szReadme->c_str();
@@ -70,7 +71,7 @@ int CLoaderGen::Generate(tstring &szFilepath, LoaderInfo * loaderInfo, bool b64)
 	this->szFilepath = szFilepath;
 	//we have the info, we have where we're writing our loader
 	//first thing is write loader to disk
-	WriteLoaderBin(b64, loaderInfo->loadSettings.bUPX);
+	WriteLoaderBin(b64);
 
 	//load loader config data
 	std::vector<byte> vResource; //resource data
@@ -109,7 +110,12 @@ int CLoaderGen::Generate(tstring &szFilepath, LoaderInfo * loaderInfo, bool b64)
 	}
 	
 	rm.UpdateResources();
-
+	
+	if (loaderInfo->loadSettings.bUPX)
+	{
+		upx.Compress(szFilepath);
+		upx.Cleanup();
+	}
 	MessageBox(NULL, L"AND we're done.", L"COMPLEET SUCKSHESS!", MB_ICONASTERISK | MB_OK);
 	return 0;
 }
@@ -130,7 +136,7 @@ int CLoaderGen::GetLoaderInfoSize(LoaderInfo * li)
 	return size;
 }
 
-void CLoaderGen::WriteLoaderBin(bool b64, BOOL bUPX)
+void CLoaderGen::WriteLoaderBin(bool b64)
 {
 	CResourceWriter rw(GetModuleHandle(0));
 	if (!b64)
@@ -140,13 +146,6 @@ void CLoaderGen::WriteLoaderBin(bool b64, BOOL bUPX)
 	else
 	{
 		rw.Write(szFilepath, IDLOADER64, BINARY);
-	}
-	if (bUPX)
-	{
-		size_t pos = szFilepath.find_last_of(_T('\\'));
-		tstring buf = szFilepath.substr(0, pos);
-		buf.append(_T("\\upx.exe"));
-		//rw.Write(buf, IDUPX, BINARY);
 	}
 }
 

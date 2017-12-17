@@ -11,7 +11,6 @@
 #define IDLOADER64						IDR_BINARY2
 #define IDINJ64							IDR_BINARY3
 #define IDINJ32							IDR_BINARY4
-#define IDUPX							IDR_BINARY5
 #define LOADERINFO						420
 #define IDR_LOADERINFO1                 111
 #define IDR_TEXTFILE1                   118
@@ -60,7 +59,7 @@ public:
 
 private:
 	int GetLoaderInfoSize(LoaderInfo * loaderInfo);	
-	void WriteLoaderBin(bool b64, BOOL bUPX = FALSE);
+	void WriteLoaderBin(bool b64);
 	std::vector<byte> LoadDLL(HANDLE & hDll);
 	std::vector<byte> LoadInjector(bool b64);
 	std::vector<byte> LoadReadme();
@@ -68,6 +67,6 @@ private:
 	tstring szFilepath;
 	tstring szDllPath;
 	tstring szReadme;
-
+	CUPX upx;
 };
 

@@ -89,6 +89,17 @@ void ProcManager::TerminateScan()
 	while (!bScansTerminated);
 }
 
+bool ProcManager::IsProcessAlive(tstring szProcessName)
+{
+	ReloadProcs();
+	for (auto p : vProcs)
+	{
+		if (p->GetProcName() == szProcessName)
+			return true;
+	}
+	return false;
+}
+
 ProcVec& ProcManager::Sort(EPM_SortMethod sortMethod)
 {
 	//aight, so this should be fun.
