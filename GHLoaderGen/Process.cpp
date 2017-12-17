@@ -117,7 +117,11 @@ void CProcess::FindProcPath()
 		if (hHandle)
 		{
 			szPath.resize(MAX_PATH);
-			GetModuleFileNameEx(hHandle, NULL, &szPath[0], MAX_PATH);
+			//fucker wasn't working on win7
+			//GetModuleFileNameEx(hHandle, NULL, &szPath[0], MAX_PATH);
+			DWORD dwLen = MAX_PATH;
+			if(QueryFullProcessImageName(hHandle, 0, &szPath[0], &dwLen))
+				szPath.resize(dwLen + 1);
 		}
 		else
 			szPath = L"";
