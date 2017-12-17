@@ -100,17 +100,6 @@ bool CProcess::Is64Bit()
 	return false;
 }
 
-bool CProcess::IsAlive()
-{
-	if(Open())
-	{
-		CloseHandle(hHandle);
-		return true;
-	}
-	CloseHandle(hHandle);
-	return false;
-}
-
 void CProcess::Start()
 {
 	Open();
