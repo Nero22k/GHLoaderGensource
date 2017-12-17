@@ -14,9 +14,9 @@
 #include <thread>
 #include <Psapi.h>
 #include <TlHelp32.h>
+#include <fstream>
 
 //#include "resource.h"
-#include "..\Utility.h"
 #include <CommCtrl.h>
 #pragma comment(lib, "Comctl32.lib")
 #pragma comment(lib, "UxTheme.lib")
@@ -36,3 +36,5 @@ typedef UINT uint;
 #define DEFLANGID MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL)
 #define OpenFile(s) CreateFile(s, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL)
 #define ErrorMsgBox(s) MessageBox(NULL, s, _T("Error!"), MB_ICONERROR | MB_OK)
+
+#include "..\Utility.h"

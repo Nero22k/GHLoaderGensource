@@ -50,12 +50,27 @@ std::vector<byte>* CBinary::Read()
 
 void CBinary::ReadPEHeader()
 {
-	//HANDLE hFile = CreateFile(szPath.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	HANDLE hFile = OpenFile(szPath.c_str());
+	////HANDLE hFile = CreateFile(szPath.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	//HANDLE hFile = OpenFile(szPath.c_str());
+	//
+	
+	//char mem[0x1000]{ 0 };
 
-	vHeader.resize(0x1000, 0);
-	BOOL bRead = ReadFile(hFile, &vHeader[0], 0x1000, NULL, NULL);
-	if (!bRead)
-		ErrorMsgBox(_T("Invalid PE file..."));
-	CloseHandle(hFile);
+	//std::ifstream in(szPath.c_str(), std::ifstream::binary | std::ifstream::ate);
+	//size_t size = in.tellg();
+
+	//if (!in.is_open() || in.bad() || size <= 0x1000)
+	//{
+	//	ErrorMsgBox(_T("Invalid PE file..."));
+	//}
+	//
+	//in.seekg(std::ifstream::beg);
+
+	//in.read(mem, 0x1000);
+	//
+	//in.close();
+	//vHeader.resize(0x1000, 0);
+	//memcpy_s(vHeader.data(), 0x1000, mem, 0x1000);
+	//CloseHandle(hFile);
+	ReadFileIntoVec(szPath, 0x1000, vHeader);
 }

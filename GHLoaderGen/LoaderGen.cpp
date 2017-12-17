@@ -152,34 +152,39 @@ void CLoaderGen::WriteLoaderBin(bool b64)
 std::vector<byte> CLoaderGen::LoadDLL(HANDLE & hDll)
 {
 	std::vector<byte> vDll;
-	hDll = OpenFile(szDllPath.c_str());
-	if (!hDll)
-	{
-		ErrorMsgBox(_T("Couldn't open dll for writing."));
-		CloseHandle(hDll);
-		return vDll;
-	}
-
-	LARGE_INTEGER largeInt{ 0 };
-	if (!GetFileSizeEx(hDll, &largeInt))
-	{
-		ErrorMsgBox(_T("Failed to get size of dll..."));
-		CloseHandle(hDll);
-		return vDll;
-	}
-
-	if (largeInt.HighPart)
-		vDll.resize(largeInt.HighPart); //can this potentially be too big???
-
-	vDll.resize(vDll.size() + largeInt.LowPart); //lol :s
-	if (!ReadFile(hDll, &vDll[0], (DWORD)vDll.size(), NULL, NULL))
-	{
-		ErrorMsgBox(_T("Failed to read dll..."));
-		CloseHandle(hDll);
-		return vDll;
-	}
-
-	CloseHandle(hDll);
+//	
+//	hDll = OpenFile(szDllPath.c_str());
+//	if (!hDll)
+//	{
+//		ErrorMsgBox(_T("Couldn't open dll for writing."));
+//		CloseHandle(hDll);
+//		return vDll;
+//	}
+//
+//	LARGE_INTEGER largeInt{ 0 };
+//	if (!GetFileSizeEx(hDll, &largeInt))
+//	{
+//		ErrorMsgBox(_T("Failed to get size of dll..."));
+//		CloseHandle(hDll);
+//		return vDll;
+//	}
+//	CloseHandle(hDll);
+//
+//	if (largeInt.HighPart)
+//		vDll.resize(largeInt.HighPart); //can this potentially be too big???
+//
+//	vDll.resize(vDll.size() + largeInt.LowPart); //lol :s
+////	if (!ReadFileEx(hDll, vDll.data(), (DWORD)vDll.size(), NULL, NULL))
+//	//std::ifstream isDll(szDllPath.c_str());
+//	//if(!isDll.is_open())
+//	//{
+//	//	ErrorMsgBox(_T("Failed to read dll..."));
+//	//	//CloseHandle(hDll);
+//	//	return vDll;
+//	//}
+//	//vDll.resize(vDll.size(), 0);
+//	//isDll.read((char*)vDll.data(), vDll.size());
+	ReadFileIntoVec(szDllPath, 0, vDll);
 	return vDll;
 }
 
@@ -195,7 +200,7 @@ std::vector<byte> CLoaderGen::LoadInjector(bool b64)
 std::vector<byte> CLoaderGen::LoadReadme()
 {
 	HANDLE hFile = CreateFile(szReadme.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (!hFile)
+	if (!hFile || hFile == INVALID_HANDLE_VALUE)
 	{
 		CloseHandle(hFile);
 		return std::vector<byte>(0);
@@ -207,15 +212,10 @@ std::vector<byte> CLoaderGen::LoadReadme()
 		CloseHandle(hFile);
 		return std::vector<byte>(0);
 	}
+	CloseHandle(hFile);
 
 	std::vector<byte> vBuffer(dwSize);
-	if (!ReadFile(hFile, &vBuffer[0], dwSize, NULL, NULL))
-	{
-		CloseHandle(hFile);
-		return std::vector<byte>(0);
-	}
-
-	CloseHandle(hFile);
+	ReadFileIntoVec(szReadme, 0, vBuffer);
 	if (vBuffer.back() != 0)
 		vBuffer.push_back(0);
 	return vBuffer;
