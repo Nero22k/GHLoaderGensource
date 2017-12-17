@@ -319,7 +319,7 @@ int GHLMainWindow::CreateControls()
 
 	// ============================================= FINALE =============================================
 	pControls->AddControl<CXCheckBox>(IDCHK_RANDNAMES, 10, DIV + 160, 180, 25, L"Randomize File Names");
-	pControls->AddControl<CXCheckBox>(IDCHK_UPXFILES, 10, DIV + 180, 180, 25, L"UPX Everything");
+	pControls->AddControl<CXCheckBox>(IDCHK_UPXFILES, 10, DIV + 180, 180, 25, L"UPX Loader");
 
 	pBtn = pControls->AddControl<CXButton>(IDBTN_BUILD, 10, DIV + 210, 510, 25, L"Generate Loader!");
 	pBtn->SetAction(bc);
