@@ -33,22 +33,12 @@ void CXListView::OnNotify(UINT code, LPARAM lParam)
 		case LVN_GETDISPINFO:
 		{
 			plvdi = (NMLVDISPINFO*)lParam;
-			//switch (plvdi->item.iSubItem)
-			//{
-			//	case 2:
-			//		plvdi->item.pszText = L"TEXT!";
-			//		break;
-			//	case 1:
-			//		plvdi->item.pszText = L"dick!";
-			//		break;
-			//}
 			CXListViewItem* pSubItem = mListItems[plvdi->item.iItem].GetSubItem(plvdi->item.iSubItem);
 			if (pSubItem)
 			{
 				szText = pSubItem->GetText();
 				plvdi->item.pszText = &szText[0];
 			}
-			//plvdi->item.pszText = L"TEXT!";
 			break;
 		}
 		break;
@@ -147,6 +137,17 @@ int CXListView::GetSelectedIndex()
 void CXListView::SetIconList()
 {
 	ListView_SetImageList(hWnd, hSmall, LVSIL_SMALL);
+}
+
+void CXListView::Clear()
+{
+	if (hSmall)
+	{
+		ImageList_RemoveAll(hSmall);
+	}
+	int count = ListView_GetItemCount(hWnd);
+	for (int i = 0; i < count; i++)
+		ListView_DeleteItem(hWnd, i);
 }
 
 CXListViewItem::CXListViewItem(int iItem, int iSubItem, tstring szText)

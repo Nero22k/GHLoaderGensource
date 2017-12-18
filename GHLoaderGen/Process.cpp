@@ -74,6 +74,8 @@ HICON CProcess::GetIcon()
 HICON CProcess::GetIconSm()
 {
 	FindIcon();
+	if (!hIconSm)
+		hIconSm = hIcon;
 	return hIconSm;
 }
 

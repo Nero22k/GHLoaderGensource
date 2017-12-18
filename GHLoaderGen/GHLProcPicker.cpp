@@ -42,6 +42,7 @@ void CGHLProcPicker::FillList()
 	ProcVec pv = procManager.GetProcs();
 	//HICON hApp = LoadIcon(NULL, IDI_APPLICATION);
 	auto xLV = xControls->GetControl<CXListView>(IDLIST1);
+	xLV->Clear();
 	for (auto p : pv)
 	{
 		//HICON i = ExtractIcon(hInstance, p->GetProcPath().c_str(), 0);
@@ -99,6 +100,7 @@ void CGHLProcPicker::SelectProcess()
 void CGHLProcPicker::Destroy()
 {
 	CXDialog::Destroy();
+	ppc();
 }
 
 void CGHLProcPicker::SetProcPickerCallback(std::function<void()> ppc)

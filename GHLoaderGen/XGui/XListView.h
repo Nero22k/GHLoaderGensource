@@ -44,6 +44,7 @@ public:
 	bool AddItem(CXListViewItem & xListViewItem);
 	int GetSelectedIndex();
 	void SetIconList();
+	void Clear();
 private:
 	int iCol = 0;
 	std::map<int, CXListViewItem> mListItems;

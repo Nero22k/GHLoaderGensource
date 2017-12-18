@@ -5,7 +5,7 @@
 CXSysLink::CXSysLink(CXWindow * pOwner, XID xID, int x, int y, int w, int h, tstring szText, CXFont * pFont)
 	: CXControl(pOwner, xID, SYSLINK, x, y, w, h, szText, pFont)
 {
-	szClass = WC_LINK;
+	szClass = _T("SysLink");
 	SetStyle(WS_VISIBLE | WS_CHILD | WS_TABSTOP | LWS_TRANSPARENT);
 }
 
@@ -33,7 +33,7 @@ void CXSysLink::OnNotify(UINT code, LPARAM lParam)
 
 			if ((((LPNMHDR)lParam)->hwndFrom == hWnd) && (lItem.iLink == 0))
 			{
-				ShellExecute(NULL, L"open", lItem.szUrl, NULL, NULL, SW_SHOW);
+				ShellExecute(NULL, _T("open"), lItem.szUrl, NULL, NULL, SW_SHOW);
 			}
 
 			break;

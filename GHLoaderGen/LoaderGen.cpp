@@ -116,7 +116,7 @@ int CLoaderGen::Generate(tstring &szFilepath, LoaderInfo * loaderInfo, bool b64)
 		upx.Compress(szFilepath);
 		upx.Cleanup();
 	}
-	MessageBox(NULL, L"AND we're done.", L"COMPLEET SUCKSHESS!", MB_ICONASTERISK | MB_OK);
+	MessageBox(NULL, _T("AND we're done."), _T("COMPLEET SUCKSHESS!"), MB_ICONASTERISK | MB_OK);
 	return 0;
 }
 
@@ -199,22 +199,22 @@ std::vector<byte> CLoaderGen::LoadInjector(bool b64)
 
 std::vector<byte> CLoaderGen::LoadReadme()
 {
-	HANDLE hFile = CreateFile(szReadme.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (!hFile || hFile == INVALID_HANDLE_VALUE)
-	{
-		CloseHandle(hFile);
-		return std::vector<byte>(0);
-	}
+	//HANDLE hFile = CreateFile(szReadme.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	//if (!hFile || hFile == INVALID_HANDLE_VALUE)
+	//{
+	//	CloseHandle(hFile);
+	//	return std::vector<byte>(0);
+	//}
 
-	DWORD dwSize = GetFileSize(hFile, nullptr);
-	if (!dwSize)
-	{
-		CloseHandle(hFile);
-		return std::vector<byte>(0);
-	}
-	CloseHandle(hFile);
+	//DWORD dwSize = GetFileSize(hFile, nullptr);
+	//if (!dwSize)
+	//{
+	//	CloseHandle(hFile);
+	//	return std::vector<byte>(0);
+	//}
+	//CloseHandle(hFile);
 
-	std::vector<byte> vBuffer(dwSize);
+	std::vector<byte> vBuffer;
 	ReadFileIntoVec(szReadme, 0, vBuffer);
 	if (vBuffer.back() != 0)
 		vBuffer.push_back(0);
