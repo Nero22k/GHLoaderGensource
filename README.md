@@ -1,6 +1,6 @@
 # README #
 
-GuidedHacking.com Loader v2.0
+GuidedHacking.com Loader v2.0 Generator
 
 ### What is this repository for? ###
 
