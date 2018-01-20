@@ -99,8 +99,9 @@ void CGHLProcPicker::SelectProcess()
 
 void CGHLProcPicker::Destroy()
 {
+	//procTarget = nullptr;
+	//ppc();
 	CXDialog::Destroy();
-	ppc();
 }
 
 void CGHLProcPicker::SetProcPickerCallback(std::function<void()> ppc)
@@ -110,5 +111,7 @@ void CGHLProcPicker::SetProcPickerCallback(std::function<void()> ppc)
 
 CProcess * CGHLProcPicker::GetSelectedProcess()
 {
+	if (!procTarget)
+		return nullptr;
 	return *procTarget;
 }

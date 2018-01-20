@@ -69,7 +69,7 @@ void GHLMainWindow::SelectProcess()
 void GHLMainWindow::ProcessSelected()
 {
 	targetProc = this->pProcPicker->GetSelectedProcess();
-	if (!targetProc)
+	if (targetProc)
 	{
 		CXControls* pC = pControls->GetControl<CXGroupBox>(IDGRP_PROCESS)->pControls;
 

@@ -215,7 +215,9 @@ std::vector<byte> CLoaderGen::LoadReadme()
 	//CloseHandle(hFile);
 
 	std::vector<byte> vBuffer;
-	ReadFileIntoVec(szReadme, 0, vBuffer);
+	if (!ReadFileIntoVec(szReadme, 0, vBuffer))
+		return vBuffer;
+
 	if (vBuffer.back() != 0)
 		vBuffer.push_back(0);
 	return vBuffer;
