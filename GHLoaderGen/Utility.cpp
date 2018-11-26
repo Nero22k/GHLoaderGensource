@@ -23,9 +23,9 @@ bool ReadFileIntoVec(tstring szFilepath, size_t szSize, std::vector<byte> & vDat
 
 	if (!in.is_open() || in.bad())
 	{
-		tstring error = _T("Failed to open:\n");
-		error.append(szFilepath);
-		ErrorMsgBox(error.c_str());
+		//tstring error = _T("Failed to open:\n");
+		//error.append(szFilepath);
+		//ErrorMsgBox(error.c_str());
 		return false;
 	}
 

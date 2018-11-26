@@ -9,6 +9,34 @@ LRESULT CALLBACK OwnerDrawProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 	
 	switch (uMsg)
 	{
+		case WM_LBUTTONDOWN:
+		{
+			pODControl->SetClicked();
+			break;
+		}
+		case WM_KILLFOCUS:
+		case WM_SETFOCUS:
+		{
+			//pODControl->SetFocus(!pODControl->GetFocused());
+			if (uMsg == WM_KILLFOCUS)
+			{
+				pODControl->SetFocus(false);
+			}
+			else
+				pODControl->SetFocus(true);
+			if (!pODControl->IsDisabled())
+			{
+				pODControl->ToggleFocusRect();
+				RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
+			}
+			
+			return 0;
+		}
+		/*{
+			pODControl->SetFocus(false);
+			RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
+			return 0;
+		}*/
 		case WM_MOUSEMOVE:
 		{
 			if (pODControl->GetControlType() == GROUPBOX)
@@ -85,10 +113,11 @@ int CXOwnerDrawControl::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	if (HIWORD(wParam) == BN_CLICKED)
 	{
+		//SetFocus(hWnd);
+		bClicked = true;
 		if (!bDisabled)
 		{
 			bChecked = !bChecked;
-			SetFocus(hWnd);
 			if (fnAction)
 				fnAction(pCommandArgs);
 		}
@@ -154,9 +183,41 @@ void CXOwnerDrawControl::SetHot(bool isHot)
 	this->bHot = isHot;
 }
 
+void CXOwnerDrawControl::SetFocus(bool isFocused)
+{
+	this->bFocused = isFocused;
+	if (!bFocused)
+		LostFocus();
+}
+
+bool CXOwnerDrawControl::GetFocused()
+{
+	return bFocused;
+}
+
+void CXOwnerDrawControl::ToggleFocusRect()
+{
+	this->bToggleFocusRect = true;
+}
+
 void CXOwnerDrawControl::Disable(bool bDisable)
 {
 	this->bDisabled = bDisable;
+}
+
+bool CXOwnerDrawControl::IsDisabled()
+{
+	return bDisabled;
+}
+
+void CXOwnerDrawControl::SetClicked()
+{
+	this->bClicked = true;
+}
+
+void CXOwnerDrawControl::LostFocus()
+{
+	this->bLostFocus = true;
 }
 
 //for radios and checkboxes
@@ -216,6 +277,11 @@ void CXOwnerDrawControl::Draw(HTHEME hTheme, LPDRAWITEMSTRUCT lpDI)
 	GetTextMetrics(lpDI->hDC, &tm);
 
 	GetThemeBackgroundContentRect(hTheme, lpDI->hDC, bp, rbState, &rcBG, &rcText);
+
+	// Select control's font into current context
+	if(pFont)
+		SelectObject(lpDI->hDC, pFont->GetHandle());
+
 	if (ControlType == GROUPBOX)
 	{
 		rcBG.top += tm.tmHeight / 2; // line the top line with the center of the text
@@ -246,15 +312,34 @@ void CXOwnerDrawControl::Draw(HTHEME hTheme, LPDRAWITEMSTRUCT lpDI)
 	rc.right -= 1;
 	rc.top += 1;
 	rc.bottom -= 1;
-
+	
+	if (this->ControlType != GROUPBOX && bToggleFocusRect)
+	{
+		while (!bClicked)
+		{
+			if (!bFocused && !bFocusDrawn)
+				break;
+			DrawFocusRect(lpDI->hDC, &rcBG);
+			bFocusDrawn = !bFocusDrawn;
+			break;
+		};
+		//if(!bFocused && bLostFocus)
+		//	DrawFocusRect(lpDI->hDC, &rcBG);
+			
+		bToggleFocusRect = false;
+		bClicked = false;
+		bLostFocus = false;
+	}
+	
 	DrawThemeBackgroundEx(hTheme, lpDI->hDC, bp, rbState, &rcBG, &dtbgOpts);
 	GetThemeBackgroundContentRect(hTheme, lpDI->hDC, bp, rbState, &rcBG, &rcRect);
-	
 	
 	if (ControlType == GROUPBOX)
 	{
 		COLORREF clBgr = GetOwnerWindow()->GetBackgroundColor();
-		hBgr = CreateSolidBrush(clBgr);
+		hBgr = (HBRUSH)GetOwnerWindow()->GetBackground();
+		//if(!hBgr)
+		//	hBgr = CreateSolidBrush(clBgr);
 		RECT rcLine = rcText;
 		rcLine.bottom -= 5;
 		rcLine.top += 5;
@@ -277,8 +362,14 @@ void CXOwnerDrawControl::Draw(HTHEME hTheme, LPDRAWITEMSTRUCT lpDI)
 		}
 			
 	}
+	
+	
+	dtOpts.dwFlags |= DTT_TEXTCOLOR;// | DTT_FONTPROP;
 	dtOpts.crText = bDisabled ? clDisabled : clText;
-	dtOpts.dwFlags |= DTT_TEXTCOLOR;
+	//dtOpts.iFontPropId = TMT_CAPTIONFONT;
 	DrawThemeTextEx(hTheme, lpDI->hDC, bp, rbState, szText.c_str(), szText.length(), dwDTFlags, &rcText, &dtOpts);
-
+	
+	//SetBkMode(lpDI->hDC, TRANSPARENT);
+	//SetTextColor(lpDI->hDC, clText);
+	//DrawText(lpDI->hDC, szText.c_str(), szText.length(), &rcText, dwDTFlags);
 }

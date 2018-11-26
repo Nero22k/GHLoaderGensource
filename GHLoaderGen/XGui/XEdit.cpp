@@ -2,21 +2,29 @@
 
 LRESULT CALLBACK EditCallback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
+	CXEdit* pEdit = (CXEdit*)dwRefData;
+	
 	switch (msg)
 	{
+		case WM_KILLFOCUS:
+		{
+			if (pEdit->pKeyPressCallback)
+				pEdit->pKeyPressCallback((void*)pEdit->GetText().c_str());
+			break;
+		}
 		case WM_KEYDOWN:
 		{
 			switch (wParam)
 			{
 				case VK_TAB:
 					//MessageBox(NULL, L"Pressed TAB", L"Test", MB_OK);
-					break;
-				case 0x41:
-					//MessageBox(NULL, L"Pressed A", L"Lol", MB_OK);
-					break;
+					return FALSE;
 				case VK_ESCAPE:
 					return TRUE;
 			}
+			//if (pEdit->pKeyPressCallback)
+			//	pEdit->pKeyPressCallback((void*)pEdit->GetText().c_str());
+			
 			break;
 		}
 	}
@@ -28,7 +36,7 @@ CXEdit::CXEdit(CXWindow * pOwner, XID xID, int x, int y, int w, int h, tstring s
 	: CXControl(pOwner, xID, EDIT, x, y, w, h, szText, pFont)
 {
 	szClass = _T("EDIT");
-	SetStyle(WS_XEDITML);
+	SetStyle(WS_XEDIT);
 	this->bMultiLine = true;
 }
 
@@ -85,4 +93,9 @@ tstring CXEdit::GetText()
 	szText.resize(Edit_GetTextLength(hWnd) + 1);
 	Edit_GetText(hWnd, &szText[0], szText.size());
 	return szText;
+}
+
+void CXEdit::SetKeyPressCallback(std::function<int(void*)> pFunction)
+{
+	this->pKeyPressCallback = pFunction;
 }

@@ -18,6 +18,7 @@ public:
 	~CProcess();
 	HANDLE Open();
 	HANDLE Open(DWORD dwAccess);
+	void Close();
 	tstring GetProcName();
 	tstring GetProcPath();
 	DWORD GetPID();

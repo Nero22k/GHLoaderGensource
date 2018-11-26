@@ -1,6 +1,8 @@
 #include "GHLProcPicker.h"
 #include "XGui\XControls.h"
 
+ProcManager* g_pProcManager = nullptr;;
+
 void BtnCallback_SelectProcess(uintptr_t pProcPicker)
 {
 	reinterpret_cast<CGHLProcPicker*>(pProcPicker)->SelectProcess();
@@ -10,6 +12,7 @@ CGHLProcPicker::CGHLProcPicker(CXWindow* pMainWindow, CProcess * procTarget)
 	: CXDialog(pMainWindow, 0x0990, pMainWindow->GetRect().right, pMainWindow->GetRect().top, 600,350, _T("Proc'Picker"))
 {
 	this->procTarget = &procTarget;
+	g_pProcManager = &procManager;
 }
 
 
@@ -114,4 +117,9 @@ CProcess * CGHLProcPicker::GetSelectedProcess()
 	if (!procTarget)
 		return nullptr;
 	return *procTarget;
+}
+
+ProcManager & CGHLProcPicker::GetProcManager()
+{
+	return this->procManager;
 }

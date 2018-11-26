@@ -5,6 +5,7 @@ CXGroupBox::CXGroupBox(CXWindow * pOwner, XID xID, int x, int y, int w, int h, t
 	: CXOwnerDrawControl(pOwner, xID, GROUPBOX, x, y, w, h, szText, pFont)
 {
 	szClass = _T("BUTTON");
+	SetExStyle(WS_EX_CONTROLPARENT);
 	SetStyle(BS_XOWNERDRAW);
 	hBgr = GetStockBrush(HOLLOW_BRUSH);	
 }

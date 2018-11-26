@@ -59,7 +59,7 @@ ProcVec& ProcManager::GetProcs()
 	return vProcs;
 }
 
-CProcess ProcManager::FindProcess(tstring szProcessName)
+CProcess* ProcManager::FindProcess(tstring szProcessName)
 {
 	while (true)
 	{
@@ -75,11 +75,11 @@ CProcess ProcManager::FindProcess(tstring szProcessName)
 			if (szProcessName != p->GetProcName())
 				continue;
 
-			return *p;
+			return p;
 		}
 		ReloadProcs();
 	}
-	return CProcess();
+	return nullptr;
 }
 
 void ProcManager::TerminateScan()

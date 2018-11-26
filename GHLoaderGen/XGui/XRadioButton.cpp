@@ -38,7 +38,7 @@ CXRadioButton::CXRadioButton(CXWindow * pOwner, XID xID, int x, int y, int w, in
 	: CXOwnerDrawControl(pOwner, xID, RADIO, x, y, w, h, szText, pFont)
 {
 	szClass = _T("BUTTON");
-	SetStyle(BS_XOWNERDRAW);
+	SetStyle(BS_XOWNERDRAWTS);
 	hBgr = GetStockBrush(HOLLOW_BRUSH);
 }
 

@@ -65,7 +65,8 @@ public:
 	GHLMainWindow(HINSTANCE hInstance, int x, int y);
 	~GHLMainWindow();
 	void SelectProcess();
-	void ProcessSelected();
+	void ProcessSelected(CProcess* pProcess = nullptr);
+	void SetProcessInfo(CProcess* pProcess = nullptr);
 	void SelectDll();
 	void SelectReadme();
 	void LaunchGH();
@@ -75,10 +76,12 @@ public:
 private:
 	int CreateControls();
 	void GetLoaderInfo(LoaderInfo & li);
+
 private:
 	CGHLProcPicker * pProcPicker = nullptr;
 	CProcess *targetProc = nullptr;
-	CLoaderGen * pGen;
+	CLoaderGen * pGen = nullptr;
 };
 
 void ProcPickerCallback();
+int ProcNameCallback(void* szProc);

@@ -182,6 +182,7 @@ void CXMainWindow::OnPaint()
 	EndPaint(hWnd, &ps);
 	
 	bUpdate = false; //don't know if i'll really need this
+	RedrawWindow(hWnd, 0, 0, RDW_INVALIDATE);
 }
 
 LRESULT CXMainWindow::OnEraseBkgrnd(WPARAM wParam)

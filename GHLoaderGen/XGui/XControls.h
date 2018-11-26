@@ -112,7 +112,7 @@ inline bool CXControls::GetControl(XID id, T * pControlOut)
 	if(!pControl)
 		return false;
 
-	pControlOut = (T*)pControl;
+	pControlOut = (T*)mControls[id];
 }
 
 template<class T>

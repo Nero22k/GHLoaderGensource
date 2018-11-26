@@ -34,8 +34,8 @@ bool CXControl::Create()
 {
 	if (!CreateXWindow())
 		return false;
-	if (pFont)
-		SetFont(pFont);
+	if (pFont || pOwnerWindow)
+		SetFont((pFont) ? pFont : pOwnerWindow->GetFont());
 	return true;
 }
 
@@ -72,14 +72,6 @@ int CXControl::OnCommand(WPARAM wParam, LPARAM, uintptr_t pArg1)
 int CXControl::OnCommand(WPARAM wParam, LPARAM)
 {
 	return 0;
-}
-
-void CXControl::SetFont(CXFont * pFont)
-{
-	HDC hDC = GetDC(hWnd);
-	SetTextColor(hDC, clText);
-	this->pFont = pFont;
-	SendMessage(hWnd, WM_SETFONT, (WPARAM)pFont->GetHandle(), (LPARAM)MAKELONG(TRUE, 0));
 }
 
 void CXControl::SetTxtColor(COLORREF clText)

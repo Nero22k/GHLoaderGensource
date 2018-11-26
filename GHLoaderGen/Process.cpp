@@ -50,6 +50,11 @@ HANDLE CProcess::Open(DWORD dwAccess)
 	return hHandle;
 }
 
+void CProcess::Close()
+{
+	CloseHandle(hHandle);
+}
+
 tstring CProcess::GetProcName()
 {
 	return szExe;
@@ -86,6 +91,8 @@ bool CProcess::Is64Bit()
 	if (!_IsWow64)
 	{
 		HMODULE hMod = GetModuleHandle(_T("kernel32"));
+		if (!hMod)
+			return false;
 		_IsWow64 = (_IsWow64Process)GetProcAddress(hMod, "IsWow64Process");
 	}
 

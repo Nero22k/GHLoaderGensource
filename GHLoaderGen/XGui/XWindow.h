@@ -1,7 +1,6 @@
 #pragma once
 #include <stdafx.h>
-
-
+#include "XFont.h"
 
 typedef int XID;
 
@@ -38,14 +37,16 @@ public:
 	virtual HICON GetIconSm();
 	virtual WINDOWPOS GetPos();
 	virtual DWORD GetStyle();
+	virtual DWORD GetExStyle();
 	virtual RECT & GetWndRect();
 	virtual HANDLE GetBackground();
 	virtual tstring GetText();
-	
+	virtual CXFont* GetFont();
 
 	virtual void SetOwnerWindow(CXWindow* pWindow);
 	virtual void SetBgColor(COLORREF clColor);
 	virtual void SetStyle(DWORD dwStyle);
+	virtual void SetExStyle(DWORD dwExStyle);
 	virtual void SetClass(tstring szClass);
 	virtual void SetText(tstring szText);
 	virtual void SetPos(int x, int y);
@@ -55,10 +56,11 @@ public:
 	virtual void SetHeight(UINT uHeight);
 	virtual void SetBrush(HBRUSH hBrush);
 	virtual void SetWndProc(WNDPROC WndProc);
-
+	virtual void SetFont(CXFont * pFont);
 	virtual void Clear();
 
 protected:
+	CXFont * pFont = nullptr;
 	CXWindow*	pOwnerWindow;
 	HINSTANCE	hInstance;
 	HWND		hOwner;

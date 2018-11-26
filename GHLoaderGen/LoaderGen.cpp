@@ -104,7 +104,7 @@ int CLoaderGen::Generate(tstring &szFilepath, LoaderInfo * loaderInfo, bool b64)
 		vReadme = LoadReadme();
 		if (!vReadme.empty())
 		{
-			CResource resReadme(IDR_TEXTFILE1, TEXTFILE, vReadme); //IMPLEMENT ME!!! :(
+			CResource resReadme(IDR_TEXTFILE1, TEXTFILE, vReadme);
 			rm.AddResource(&resReadme);
 		}
 	}

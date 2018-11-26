@@ -24,3 +24,4 @@ private:
 };
 
 extern CXMainWindow * g_pMainWindow;
+extern CXControls * g_pControls;

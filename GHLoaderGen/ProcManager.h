@@ -32,7 +32,7 @@ public:
 	int ReloadProcs();
 	int LoadProcs();
 	ProcVec& GetProcs();
-	CProcess FindProcess(tstring szProcessName);
+	CProcess* FindProcess(tstring szProcessName);
 	void TerminateScan();
 	bool IsProcessAlive(tstring szProcessName);
 public:

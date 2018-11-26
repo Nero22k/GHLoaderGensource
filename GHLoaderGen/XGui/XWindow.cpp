@@ -59,6 +59,7 @@ void CXWindow::Init()
 	dwStyle = NULL;
 	szClass = _T("");
 	szText = _T("");
+	pOwnerWindow = nullptr;
 }
 
 WNDCLASSEX CXWindow::CreateBasicClass(tstring &szClassName)
@@ -97,6 +98,8 @@ bool CXWindow::CreateXWindow()
 
 	if (!hWnd)
 		return false;
+	if (pOwnerWindow)
+		pFont = pOwnerWindow->GetFont();
 	UpdateWindow(hWnd);
 	ShowWindow(hWnd, SW_SHOW);
 	GetRect();
@@ -190,6 +193,11 @@ DWORD CXWindow::GetStyle()
 	return dwStyle;
 }
 
+DWORD CXWindow::GetExStyle()
+{
+	return dwExStyle;
+}
+
 RECT & CXWindow::GetWndRect()
 {
 	GetWindowRect(hWnd, &rcWindow);
@@ -204,6 +212,11 @@ HANDLE CXWindow::GetBackground()
 tstring CXWindow::GetText()
 {
 	return this->szText;
+}
+
+CXFont * CXWindow::GetFont()
+{
+	return pFont;
 }
 
 void CXWindow::SetOwnerWindow(CXWindow * pWindow)
@@ -227,6 +240,11 @@ void CXWindow::SetStyle(DWORD dwStyle)
 	this->dwStyle = dwStyle;
 	SetWindowLongPtr(hWnd, GWL_STYLE, dwStyle);
 	RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
+}
+
+void CXWindow::SetExStyle(DWORD dwExStyle)
+{
+	this->dwExStyle = dwExStyle;
 }
 
 void CXWindow::SetClass(tstring szClass)
@@ -270,6 +288,16 @@ void CXWindow::SetBrush(HBRUSH hBrush)
 void CXWindow::SetWndProc(WNDPROC WndProc)
 {
 	SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG)WndProc);
+}
+
+void CXWindow::SetFont(CXFont * pFont)
+{
+	//HDC hDC = GetDC(hWnd);
+	//SetTextColor(hDC, clText);
+	if (!pFont)
+		return;
+	this->pFont = pFont;
+	SendMessage(hWnd, WM_SETFONT, (WPARAM)pFont->GetHandle(), (LPARAM)MAKELONG(TRUE, 0));	
 }
 
 void CXWindow::Clear()

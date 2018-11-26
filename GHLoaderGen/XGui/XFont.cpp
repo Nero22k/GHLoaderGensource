@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "XFont.h"
 
 CXFont::CXFont()

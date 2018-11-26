@@ -40,6 +40,7 @@ GHLMainWindow::GHLMainWindow(HINSTANCE hInstance, int x, int y)
 {
 	g_pMainWindow = this;
 	g_pMain = this;
+	
 	SetBgColor(GHL_WND_BGCLR);
 	SetStyle(WS_VISIBLE | WS_SYSMENU | WS_MINIMIZEBOX);
 
@@ -66,31 +67,45 @@ void GHLMainWindow::SelectProcess()
 	pProcPicker->Show();
 }
 
-void GHLMainWindow::ProcessSelected()
+void GHLMainWindow::ProcessSelected(CProcess* pProcess /*= nullptr*/)
 {
-	targetProc = this->pProcPicker->GetSelectedProcess();
+	targetProc = (pProcess) ? pProcess : this->pProcPicker->GetSelectedProcess();
 	if (targetProc)
 	{
-		CXControls* pC = pControls->GetControl<CXGroupBox>(IDGRP_PROCESS)->pControls;
-
-		pC->GetControl<CXEdit>(IDEDT_PROCNAME)->SetText(targetProc->GetProcName());
-		CXLabel * pL = pC->GetControl<CXLabel>(IDLBL_PID);
-		tstring buf(22, 0);
-		_itot_s(targetProc->GetPID(), &buf[0], 22, 10);
-		tstring pid = _T("PID: ");
-		pid += buf;
-		pid.resize(lstrlen(pid.c_str()));
-		pL->SetText(pid);
-		bool b64 = targetProc->Is64Bit();
-		pL = pC->GetControl<CXLabel>(IDLBL_ARCH);
-		tstring arch = _T("Arch: ");
-		arch += (b64) ? _T("x64") : _T("x86");
-		pL->SetText(arch);
-
-		pC->GetControl<CXIcon>(0x1111)->Load(targetProc->GetIcon());
+		SetProcessInfo(pProcess);
 	}
-	SetFocus(hWnd);
+
 	RedrawWindow(hWnd, NULL, NULL, RDW_INVALIDATE);
+
+	if (!pProcess)
+		SetFocus(hWnd);
+}
+
+void GHLMainWindow::SetProcessInfo(CProcess * pProcess)
+{
+	if (pProcess)
+		targetProc = pProcess;
+
+	CXControls* pC = pControls->GetControl<CXGroupBox>(IDGRP_PROCESS)->pControls;
+	
+	// if not null then user is typing in this textbox
+	if (!pProcess)
+		pC->GetControl<CXEdit>(IDEDT_PROCNAME)->SetText(targetProc->GetProcName());
+
+	CXLabel * pL = pC->GetControl<CXLabel>(IDLBL_PID);
+	tstring buf(22, 0);
+	_itot_s(targetProc->GetPID(), &buf[0], 22, 10);
+	tstring pid = _T("PID: ");
+	pid += buf;
+	pid.resize(lstrlen(pid.c_str()));
+	pL->SetText(pid);
+	bool b64 = targetProc->Is64Bit();
+	pL = pC->GetControl<CXLabel>(IDLBL_ARCH);
+	tstring arch = _T("Arch: ");
+	arch += (b64) ? _T("x64") : _T("x86");
+	pL->SetText(arch);
+
+	pC->GetControl<CXIcon>(0x1111)->Load(targetProc->GetIcon());
 }
 
 void GHLMainWindow::SelectDll()
@@ -121,13 +136,45 @@ void GHLMainWindow::GenerateLoader()
 {
 	//first we need to check if everything is good to go
 	//check if there's a process selected and a dll ready to load
+	bool b64Process = false;
 	if (!targetProc)
 	{
-		MessageBox(hWnd, _T("Please select a process..."), _T("Yo dumbass!"), MB_ICONERROR | MB_OK);
-		return;
+		auto pGB = pControls->GetControl<CXGroupBox>(IDGRP_PROCESS);
+		auto pEdit = pGB->pControls->GetControl<CXEdit>(IDEDT_PROCNAME);
+		auto sProc = pEdit->GetText();
+		if (!sProc.empty())
+		{
+			this->pProcPicker->GetProcManager().LoadProcs();
+			auto procs = this->pProcPicker->GetProcManager().GetProcs();
+			for (auto proc : procs)
+			{
+				if(!lstrcmp(sProc.c_str(), proc->GetProcName().c_str()))
+				{
+					targetProc = proc;
+					break;
+				}
+			}
+			if (!targetProc)
+			{
+				tstring error = _T("There doesn't seem to be a process named \"");
+				error += sProc;
+				error.pop_back();
+				error += _T("\" currently running.\nWould you like to continue either way?");
+				auto i = MessageBox(hWnd, error.c_str(), _T("Hold on now..."), MB_OKCANCEL | MB_ICONQUESTION);
+				if (i == IDCANCEL)
+					return;
+				i = MessageBox(hWnd, _T("In that case, you tell me...\nIs this a 64-bit process?"), _T("Alrighty then..."), MB_YESNO | MB_ICONQUESTION);
+				if (i == IDYES)
+					b64Process = true;
+			}
+		}
+		else
+		{
+			MessageBox(hWnd, _T("Please select a process..."), _T("Yo dumbass!"), MB_ICONERROR | MB_OK);
+			return;
+		}
 	}
-
-
+	
 	if (!lstrcmp(pControls->GetControl<CXEdit>(IDEDT_DLLPATH)->GetText().c_str(), _T("")))
 	{
 		MessageBox(hWnd, _T("Might help if you select a dll to load..."), _T("Yo dumbass!"), MB_ICONERROR | MB_OK);
@@ -148,7 +195,14 @@ void GHLMainWindow::GenerateLoader()
 	}
 
 	//check if dll matches arch of selected process
-	if (targetProc->Is64Bit() != dll.Is64BitImage())
+	bool b64Dll = dll.Is64BitImage();
+	bool bMismatch = false;
+	if (!targetProc)
+		bMismatch = b64Process != b64Dll;
+	else
+		bMismatch = targetProc->Is64Bit() != b64Dll;
+
+	if (bMismatch)
 	{
 		MessageBox(NULL, _T("Architecture of DLL does not match that of the game!"), _T("Error!"), MB_ICONERROR | MB_OK);
 		return;
@@ -215,7 +269,8 @@ int GHLMainWindow::CreateControls()
 	CXGroupBox * pGb;
 	CXButton * pBtn;
 	std::function<void(uintptr_t)> bc = BtnCallback;
-
+	//this->pFont = new CXFont(_T("Segoe UI"), -14);
+	//pFont->Create();
 	// ============================================= LOADER SETTINGS =============================================
 	pGb = pControls->AddControl<CXGroupBox>(IDGRP_LOADSET, 10, 5, 270, 115, _T("Loader Settings"));
 	pGb->SetTxtColor(RGB(200, 200, 200));
@@ -229,16 +284,16 @@ int GHLMainWindow::CreateControls()
 	pC->AddControl<CXLabel>(IDLBL_AUTHOR, 10, 83, 90, 25, _T("Author:"));
 	pC->AddControl<CXEdit>(IDEDT_AUTHOR, 110, 80, 150, 25, _T("Traxin"));
 
-	pControls->AddControl<CXEdit>(IDEDT_DLLPATH, 290, 45, 275, 25, _T("C:\\hax.dll"));
 	pBtn = pControls->AddControl<CXButton>(IDBTN_DLLSELECT, 290, 10, 125, 25, _T("Select DLL"));
 	pBtn->SetAction(bc);
 	pBtn->SetCommandArgs(SELECT_DLL);
 		
-	pControls->AddControl<CXEdit>(IDEDT_README, 290, 80, 275, 25, _T("C:\\readme.txt"));
 	pBtn = pControls->AddControl<CXButton>(IDBTN_README, 440, 10, 125, 25, _T("Select Readme"));
 	pBtn->SetAction(bc);
 	pBtn->SetCommandArgs(SELECT_README);
 	
+	pControls->AddControl<CXEdit>(IDEDT_DLLPATH, 290, 45, 275, 25, _T("C:\\hax.dll"));
+	pControls->AddControl<CXEdit>(IDEDT_README, 290, 80, 275, 25, _T("C:\\readme.txt"));
 #define DIV 115
 
 	// ============================================= PROCESS =============================================
@@ -252,7 +307,10 @@ int GHLMainWindow::CreateControls()
 
 	//pC->AddGroup(IDGRP_PROCESS);
 	//pC->AddControlToGroup<CXLabel>(IDGRP_PROCESS, IDLBL_PROCNAME, 10, 23, 40, 25, L"Name:");
-	pC->AddControl<CXEdit>(IDEDT_PROCNAME, 65, 20, 120, 25, _T("ac_client.exe"));
+	
+	auto pEdit = pC->AddControl<CXEdit>(IDEDT_PROCNAME, 65, 20, 120, 25, _T("ac_client.exe"));
+	pEdit->SetKeyPressCallback(ProcNameCallback);
+
 	pCtrl = pC->AddControl<CXLabel>(IDLBL_PID, 10, 55, 100, 25, _T("PID: "));
 	pCtrl = pC->AddControl<CXLabel>(IDLBL_ARCH, 10, 85, 100, 25, _T("Arch: "));
 	auto pIco = pC->AddControl<CXIcon>(0x1111, 120, 60, 32, 32, _T(" "));
@@ -315,13 +373,13 @@ int GHLMainWindow::CreateControls()
 	pCheck = pC->vGroups[IDGRP_INJSET]->GetControl<CXRadioButton>(IDCHK_CDDIR);
 	pCheck->Disable(true);
 	
-	pCtrl = pC->AddControl<CXLabel>(IDLBL_DELAY, 50, 148, 100, 25, _T("Delay: "));
+	pCtrl = pC->AddControl<CXLabel>(IDLBL_DELAY, 50, 148, 50, 25, _T("Delay: "));
 	pCtrl->SetTxtColor(RGB(200, 200, 200));
 	pCtrl = pC->AddControl<CXEdit>(IDEDT_DELAY, 120, 145, 200, 25, _T("0"));
 	pCtrl->SetStyle(pCtrl->GetStyle() | ES_NUMBER);
 
 	// ============================================= FINALE =============================================
-	pControls->AddControl<CXCheckBox>(IDCHK_RANDNAMES, 10, DIV + 160, 180, 25, _T("Randomize File Names"));
+	pControls->AddControl<CXCheckBox>(IDCHK_RANDNAMES, 10, DIV + 160, 180, 25, _T("Randomize File Names"), pFont);
 	pControls->AddControl<CXCheckBox>(IDCHK_UPXFILES, 10, DIV + 180, 180, 25, _T("UPX Loader"));
 
 	pBtn = pControls->AddControl<CXButton>(IDBTN_BUILD, 10, DIV + 210, 510, 25, _T("Generate Loader!"));
@@ -396,4 +454,31 @@ void GHLMainWindow::GetLoaderInfo(LoaderInfo & li)
 void ProcPickerCallback()
 {
 	g_pMain->ProcessSelected();
+}
+
+CXEdit* pProcNameEdit = nullptr;
+int ProcNameCallback(void * szProc)
+{
+	if (!pProcNameEdit)
+	{
+		auto pGB = (CXGroupBox*)g_pControls->mControls[IDGRP_PROCESS];
+		pProcNameEdit = (CXEdit*)pGB->pControls->mControls[IDEDT_PROCNAME];
+	}
+	
+	tstring szProcess = (const TCHAR*)szProc;
+	g_pProcManager->ReloadProcs();
+	auto procs = g_pProcManager->GetProcs();
+	//if (procs.empty())
+	//{
+	//	procs = g_pProcManager->GetProcs();
+	//}
+	
+	for (auto proc : procs)
+	{
+		auto found = proc->GetProcName().find(szProcess);
+		if (found != tstring::npos)
+			g_pMain->ProcessSelected(proc);
+	}
+
+	return 0;
 }

@@ -1,4 +1,6 @@
 #pragma once
+#define WINVER 0x0601
+#define _WIN32_WINNT 0x0601
 #include <Windows.h>
 #include <windowsx.h>
 #include <tchar.h>
@@ -9,6 +11,7 @@
 #include <algorithm>
 #include <memory>
 #include <Uxtheme.h>
+//#include <vssym32.h>
 #include <vsstyle.h>
 #include <chrono>
 #include <thread>
@@ -20,6 +23,7 @@
 #include <CommCtrl.h>
 #pragma comment(lib, "Comctl32.lib")
 #pragma comment(lib, "UxTheme.lib")
+
 //applies current windows theme to controls.
 #pragma comment(linker,"\"/manifestdependency:type='win32' \
 name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \

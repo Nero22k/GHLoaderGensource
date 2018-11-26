@@ -13,9 +13,14 @@ public:
 	virtual bool Create();
 	virtual int OnCommand(WPARAM wParam, LPARAM lParam);
 	virtual int OnKey(WPARAM wParam, LPARAM lParam);
+	
 	tstring GetText();
+	void SetKeyPressCallback(std::function<int(void*)> pFunction);
+
 
 private:
 	bool bMultiLine = false;
+public:
+	std::function<int(void*)> pKeyPressCallback;
 };
 

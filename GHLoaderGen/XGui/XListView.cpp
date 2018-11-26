@@ -87,7 +87,7 @@ void CXListView::SetColumnWidth(int iColumn, int width)
 bool CXListView::AddItem(int iItem, int iSubItem)
 {
 	LVITEM lvi;
-	lvi.pszText = L"semen";
+	lvi.pszText = _T("");
 	lvi.mask = LVIF_TEXT | LVIF_IMAGE | LVIF_STATE;
 	lvi.state = 0;
 	lvi.stateMask = 0;
@@ -103,7 +103,7 @@ bool CXListView::AddItem(int iItem, int iSubItem)
 
 bool CXListView::AddItem(CXListViewItem & xListViewItem)
 {
-	if (!ListView_InsertItem(hWnd, &xListViewItem.GetItem()) == -1)
+	if (ListView_InsertItem(hWnd, &xListViewItem.GetItem()) == -1)
 		return false;
 	//usually 
 	for (auto si : xListViewItem.GetSubItems())

@@ -1,6 +1,5 @@
 #pragma once
 #include "XWindow.h"
-#include "XFont.h"
 
 enum ECXControl
 {
@@ -29,7 +28,7 @@ public:
 	virtual bool Create();
 	virtual ECXControl GetControlType();
 	virtual RECT GetAdjustedRect();
-	virtual void SetFont(CXFont * pFont);
+	
 	virtual void SetTxtColor(COLORREF clText);
 	virtual void SetAction(std::function<void(uintptr_t)> fnAction);
 	virtual void SetCommandArgs(uintptr_t pArgs);
@@ -45,7 +44,7 @@ public:
 
 protected:
 	ECXControl ControlType;
-	CXFont * pFont = nullptr;
+
 	std::function<void(uintptr_t)> fnAction;
 	uintptr_t pCommandArgs = 0;
 	COLORREF clText = RGB(255,0,0);
